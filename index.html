@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saarth — Builder. Tinkerer. Tabla player.</title>
+  <meta name="description" content="Saarth is a 14-year-old builder making websites, tools, and systems that actually get used." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23060608'/%3E%3Ctext x='16' y='23' font-family='sans-serif' font-size='20' font-weight='700' fill='%23ff4d2e' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- Preloader -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-inner">
+      <span class="preloader-count" id="preloaderCount">00</span>
+      <span class="preloader-label">// initializing</span>
+    </div>
+  </div>
+
+  <!-- Three.js canvas -->
+  <canvas id="webgl" aria-hidden="true"></canvas>
+
+  <!-- Custom cursor -->
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="#top" class="nav-logo" data-cursor="hover">S/</a>
+    <div class="nav-links">
+      <a href="#projects" data-cursor="hover">Projects</a>
+      <a href="#now" data-cursor="hover">Now</a>
+      <a href="#tabla" data-cursor="hover">Tabla</a>
+      <a href="#contact" class="nav-cta" data-cursor="hover">Contact</a>
+    </div>
+  </nav>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <p class="hero-eyebrow"><span class="line">Builder. Tinkerer. Occasionally a tabla player.</span></p>
+      <h1 class="hero-title" aria-label="Saarth">
+        <span class="hero-char">S</span><span class="hero-char">A</span><span class="hero-char">A</span><span class="hero-char">R</span><span class="hero-char">T</span><span class="hero-char">H</span>
+      </h1>
+      <p class="hero-sub">
+        <span class="line">I'm 14. I build things that solve real problems</span>
+        <span class="line">and actually get used.</span>
+      </p>
+      <div class="hero-scroll" aria-hidden="true">
+        <span>scroll</span>
+        <div class="hero-scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track" id="marqueeTrack">
+        <span>websites · tools · systems · trading bots · CRMs · study sites · tabla ·&nbsp;</span>
+        <span>websites · tools · systems · trading bots · CRMs · study sites · tabla ·&nbsp;</span>
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <section class="section projects" id="projects">
+      <div class="section-head">
+        <span class="section-index">01</span>
+        <h2 class="section-title"><span class="reveal-line">Things I've</span> <span class="reveal-line">shipped</span></h2>
+      </div>
+
+      <div class="project-list">
+        <a class="project" href="https://physics7c.vercel.app" target="_blank" rel="noopener" data-cursor="view">
+          <div class="project-meta">
+            <span class="project-num">P.01</span>
+            <span class="project-tag">education</span>
+          </div>
+          <h3 class="project-name">Physics 7C Study Site</h3>
+          <p class="project-desc">Built for my sister's college physics class. Her classmates started using it too. Waves, interference, Doppler, all of it.</p>
+          <span class="project-link">physics7c.vercel.app ↗</span>
+        </a>
+
+        <a class="project" href="https://ascenta3.vercel.app" target="_blank" rel="noopener" data-cursor="view">
+          <div class="project-meta">
+            <span class="project-num">P.02</span>
+            <span class="project-tag">platform</span>
+          </div>
+          <h3 class="project-name">Ascenta</h3>
+          <p class="project-desc">Unblocked games and chat, built for school. Live, used daily.</p>
+          <span class="project-link">ascenta3.vercel.app ↗</span>
+        </a>
+
+        <div class="project" data-cursor="hover" tabindex="0">
+          <div class="project-meta">
+            <span class="project-num">P.03</span>
+            <span class="project-tag">finance</span>
+          </div>
+          <h3 class="project-name">Algorithmic Trading System</h3>
+          <p class="project-desc">Mean-reversion on GBPJPY and EURUSD. Runs on an IBKR paper account with ib_insync and TradingView webhooks.</p>
+          <span class="project-stat"><span class="stat-num" data-count="90.7">0</span>% win rate on backtest</span>
+        </div>
+
+        <div class="project" data-cursor="hover" tabindex="0">
+          <div class="project-meta">
+            <span class="project-num">P.04</span>
+            <span class="project-tag">internal tool</span>
+          </div>
+          <h3 class="project-name">Internship Outreach CRM</h3>
+          <p class="project-desc">I was emailing ~<span class="stat-num" data-count="400">0</span> companies about internships and the spreadsheet gave up. So I built a real CRM. React, TypeScript, Node, Gmail API.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOW -->
+    <section class="section now" id="now">
+      <div class="section-head">
+        <span class="section-index">02</span>
+        <h2 class="section-title"><span class="reveal-line">Currently</span></h2>
+      </div>
+      <p class="now-text reveal-block">
+        Interning at <strong>Frizzle</strong> <span class="yc-badge">YC</span>, building cold email infrastructure for schools. At scale, for real this time.
+      </p>
+    </section>
+
+    <!-- TABLA -->
+    <section class="section tabla" id="tabla">
+      <div class="section-head">
+        <span class="section-index">03</span>
+        <h2 class="section-title"><span class="reveal-line">Off the</span> <span class="reveal-line">screen</span></h2>
+      </div>
+      <p class="tabla-text reveal-block">
+        I've played tabla for years. Performed, taught, the works.
+        It's the one thing I do that has nothing to do with a screen. <em>Except right now. Try it:</em>
+      </p>
+      <div class="tabla-pads" role="group" aria-label="Playable tabla — tap pads or press keys 1 to 4">
+        <button class="pad" data-bol="dha" data-cursor="hit"><span class="pad-bol">Dha</span><span class="pad-key">1</span></button>
+        <button class="pad" data-bol="tin" data-cursor="hit"><span class="pad-bol">Tin</span><span class="pad-key">2</span></button>
+        <button class="pad" data-bol="na"  data-cursor="hit"><span class="pad-bol">Na</span><span class="pad-key">3</span></button>
+        <button class="pad" data-bol="ge"  data-cursor="hit"><span class="pad-bol">Ge</span><span class="pad-key">4</span></button>
+      </div>
+      <p class="tabla-hint">tap the pads · or use keys 1–4</p>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section contact" id="contact">
+      <span class="section-index">04</span>
+      <h2 class="contact-title">
+        <span class="reveal-line">Let's build</span>
+        <span class="reveal-line">something.</span>
+      </h2>
+      <a class="contact-email" href="mailto:hello@saarth.dev" data-cursor="view">hello@saarth.dev</a>
+      <footer class="footer">
+        <span>© 2026 Saarth</span>
+        <span>Designed & built by me, obviously</span>
+      </footer>
+    </section>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
