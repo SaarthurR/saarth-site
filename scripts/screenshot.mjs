@@ -17,17 +17,14 @@ await page.goto("http://localhost:5179", { waitUntil: "networkidle" });
 await page.waitForTimeout(3500); // let preloader + intro finish
 await page.screenshot({ path: "shots/hero.png" });
 
-await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight * 0.32));
-await page.waitForTimeout(1800);
-await page.screenshot({ path: "shots/projects.png" });
-
-await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight * 0.72));
-await page.waitForTimeout(1800);
-await page.screenshot({ path: "shots/tabla.png" });
-
-await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-await page.waitForTimeout(1800);
-await page.screenshot({ path: "shots/contact.png" });
+const sections = ["projects", "physics", "ascenta", "trading", "crm", "now", "tabla", "contact"];
+for (const id of sections) {
+  await page.evaluate((sel) => {
+    document.getElementById(sel).scrollIntoView({ block: "center", behavior: "instant" });
+  }, id);
+  await page.waitForTimeout(2200); // let the shape morph settle
+  await page.screenshot({ path: `shots/${id}.png` });
+}
 
 // mobile viewport check
 const mob = await browser.newPage({ viewport: { width: 375, height: 812 } });

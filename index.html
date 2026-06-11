@@ -40,7 +40,7 @@
 
   <main id="top">
     <!-- HERO -->
-    <section class="hero" id="hero">
+    <section class="hero" id="hero" data-shape>
       <p class="hero-eyebrow"><span class="line">Builder. Tinkerer. Occasionally a tabla player.</span></p>
       <h1 class="hero-title" aria-label="Saarth">
         <span class="hero-char">S</span><span class="hero-char">A</span><span class="hero-char">A</span><span class="hero-char">R</span><span class="hero-char">T</span><span class="hero-char">H</span>
@@ -63,57 +63,63 @@
       </div>
     </div>
 
-    <!-- PROJECTS -->
-    <section class="section projects" id="projects">
+    <!-- PROJECTS INTRO -->
+    <section class="section projects-intro" id="projects" data-shape>
       <div class="section-head">
         <span class="section-index">01</span>
         <h2 class="section-title"><span class="reveal-line">Things I've</span> <span class="reveal-line">shipped</span></h2>
       </div>
+    </section>
 
-      <div class="project-list">
-        <a class="project" href="https://physics7c.vercel.app" target="_blank" rel="noopener" data-cursor="view">
-          <div class="project-meta">
-            <span class="project-num">P.01</span>
-            <span class="project-tag">education</span>
-          </div>
-          <h3 class="project-name">Physics 7C Study Site</h3>
-          <p class="project-desc">Built for my sister's college physics class. Her classmates started using it too. Waves, interference, Doppler, all of it.</p>
-          <span class="project-link">physics7c.vercel.app ↗</span>
-        </a>
-
-        <a class="project" href="https://ascenta3.vercel.app" target="_blank" rel="noopener" data-cursor="view">
-          <div class="project-meta">
-            <span class="project-num">P.02</span>
-            <span class="project-tag">platform</span>
-          </div>
-          <h3 class="project-name">Ascenta</h3>
-          <p class="project-desc">Unblocked games and chat, built for school. Live, used daily.</p>
-          <span class="project-link">ascenta3.vercel.app ↗</span>
-        </a>
-
-        <div class="project" data-cursor="hover" tabindex="0">
-          <div class="project-meta">
-            <span class="project-num">P.03</span>
-            <span class="project-tag">finance</span>
-          </div>
-          <h3 class="project-name">Algorithmic Trading System</h3>
-          <p class="project-desc">Mean-reversion on GBPJPY and EURUSD. Runs on an IBKR paper account with ib_insync and TradingView webhooks.</p>
-          <span class="project-stat"><span class="stat-num" data-count="90.7">0</span>% win rate on backtest</span>
+    <section class="section project-view" id="physics" data-shape>
+      <a class="project" href="https://physics7c.vercel.app" target="_blank" rel="noopener" data-cursor="view">
+        <div class="project-meta">
+          <span class="project-num">P.01</span>
+          <span class="project-tag">education</span>
         </div>
+        <h3 class="project-name">Physics 7C Study Site</h3>
+        <p class="project-desc">Built for my sister's college physics class. Her classmates started using it too. Waves, interference, Doppler, all of it.</p>
+        <span class="project-link">physics7c.vercel.app ↗</span>
+      </a>
+    </section>
 
-        <div class="project" data-cursor="hover" tabindex="0">
-          <div class="project-meta">
-            <span class="project-num">P.04</span>
-            <span class="project-tag">internal tool</span>
-          </div>
-          <h3 class="project-name">Internship Outreach CRM</h3>
-          <p class="project-desc">I was emailing ~<span class="stat-num" data-count="400">0</span> companies about internships and the spreadsheet gave up. So I built a real CRM. React, TypeScript, Node, Gmail API.</p>
+    <section class="section project-view" id="ascenta" data-shape>
+      <a class="project" href="https://ascenta3.vercel.app" target="_blank" rel="noopener" data-cursor="view">
+        <div class="project-meta">
+          <span class="project-num">P.02</span>
+          <span class="project-tag">platform</span>
         </div>
+        <h3 class="project-name">Ascenta</h3>
+        <p class="project-desc">Unblocked games and chat, built for school. Live, used daily.</p>
+        <span class="project-link">ascenta3.vercel.app ↗</span>
+      </a>
+    </section>
+
+    <section class="section project-view" id="trading" data-shape>
+      <div class="project" data-cursor="hover" tabindex="0">
+        <div class="project-meta">
+          <span class="project-num">P.03</span>
+          <span class="project-tag">finance</span>
+        </div>
+        <h3 class="project-name">Algorithmic Trading System</h3>
+        <p class="project-desc">Mean-reversion on GBPJPY and EURUSD. Runs on an IBKR paper account with ib_insync and TradingView webhooks.</p>
+        <span class="project-stat"><span class="stat-num" data-count="90.7">0</span>% win rate on backtest</span>
+      </div>
+    </section>
+
+    <section class="section project-view" id="crm" data-shape>
+      <div class="project" data-cursor="hover" tabindex="0">
+        <div class="project-meta">
+          <span class="project-num">P.04</span>
+          <span class="project-tag">internal tool</span>
+        </div>
+        <h3 class="project-name">Internship Outreach CRM</h3>
+        <p class="project-desc">I was emailing ~<span class="stat-num" data-count="400">0</span> companies about internships and the spreadsheet gave up. So I built a real CRM. React, TypeScript, Node, Gmail API.</p>
       </div>
     </section>
 
     <!-- NOW -->
-    <section class="section now" id="now">
+    <section class="section now" id="now" data-shape>
       <div class="section-head">
         <span class="section-index">02</span>
         <h2 class="section-title"><span class="reveal-line">Currently</span></h2>
@@ -124,7 +130,7 @@
     </section>
 
     <!-- TABLA -->
-    <section class="section tabla" id="tabla">
+    <section class="section tabla" id="tabla" data-shape>
       <div class="section-head">
         <span class="section-index">03</span>
         <h2 class="section-title"><span class="reveal-line">Off the</span> <span class="reveal-line">screen</span></h2>
@@ -143,7 +149,7 @@
     </section>
 
     <!-- CONTACT -->
-    <section class="section contact" id="contact">
+    <section class="section contact" id="contact" data-shape>
       <span class="section-index">04</span>
       <h2 class="contact-title">
         <span class="reveal-line">Let's build</span>

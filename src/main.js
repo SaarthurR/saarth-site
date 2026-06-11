@@ -20,24 +20,36 @@ if (!reducedMotion) {
   gsap.ticker.lagSmoothing(0);
 }
 
-// drive the particle sphere morph with overall page progress
-ScrollTrigger.create({
-  trigger: document.body,
-  start: "top top",
-  end: "bottom bottom",
-  onUpdate: (self) => sceneApi.setScroll(self.progress),
-});
+// Each [data-shape] section is an anchor for one particle shape.
+// Page progress maps the viewport center between section centers to a
+// continuous shape index that the scene morphs along.
+const shapeSections = gsap.utils.toArray("[data-shape]");
+let shapeAnchors = [];
+function refreshAnchors() {
+  shapeAnchors = shapeSections.map((s) => {
+    const r = s.getBoundingClientRect();
+    return window.scrollY + r.top + r.height / 2;
+  });
+}
+window.addEventListener("load", refreshAnchors);
+window.addEventListener("resize", refreshAnchors);
+refreshAnchors();
 
-// the shader already dims the dust; this is just a gentle extra fade for body text
-gsap.to("#webgl", {
-  opacity: 0.55,
-  ease: "none",
-  scrollTrigger: { trigger: "#projects", start: "top 75%", end: "top 25%", scrub: true },
-});
-gsap.to("#webgl", {
-  opacity: 1,
-  ease: "none",
-  scrollTrigger: { trigger: "#contact", start: "top 90%", end: "top 40%", scrub: true },
+gsap.ticker.add(() => {
+  const c = window.scrollY + window.innerHeight / 2;
+  const n = shapeAnchors.length;
+  if (!n) return;
+  let f = 0;
+  if (c <= shapeAnchors[0]) {
+    f = 0;
+  } else if (c >= shapeAnchors[n - 1]) {
+    f = n - 1;
+  } else {
+    let k = 0;
+    while (k < n - 2 && c > shapeAnchors[k + 1]) k++;
+    f = k + (c - shapeAnchors[k]) / (shapeAnchors[k + 1] - shapeAnchors[k]);
+  }
+  sceneApi.setProgress(f);
 });
 
 /* ---------- Preloader + hero intro ---------- */
@@ -128,14 +140,14 @@ gsap.utils.toArray(".reveal-block").forEach((el) => {
   });
 });
 
-gsap.utils.toArray(".project").forEach((el, i) => {
+// projects glide in from the left as their section centers
+gsap.utils.toArray(".project").forEach((el) => {
   gsap.from(el, {
-    y: 60,
+    x: -80,
     opacity: 0,
-    duration: 0.9,
-    delay: (i % 2) * 0.08,
+    duration: 1,
     ease: "power3.out",
-    scrollTrigger: { trigger: el, start: "top 90%" },
+    scrollTrigger: { trigger: el, start: "top 75%" },
   });
 });
 

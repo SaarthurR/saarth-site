@@ -218,18 +218,27 @@ main { position: relative; z-index: 1; }
 .reveal-line > .inner { display: inline-block; }
 
 /* ---------- Projects ---------- */
-.project-list { display: flex; flex-direction: column; }
+.projects-intro {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+}
+.projects-intro .section-head { margin-bottom: 0; }
+.project-view {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
 .project {
   display: block;
   padding: clamp(2rem, 4vw, 3rem) 0;
-  border-top: 1px solid var(--line);
+  max-width: 40rem;
   text-decoration: none;
   color: inherit;
   position: relative;
   transition: padding-left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
 }
-.project:last-child { border-bottom: 1px solid var(--line); }
 .project::before {
   content: "";
   position: absolute; left: 0; top: 0;
