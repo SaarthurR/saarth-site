@@ -21,9 +21,9 @@ function waveField(count) {
   const out = new Float32Array(count * 3);
   const tilt = -0.3, c = Math.cos(tilt), s = Math.sin(tilt);
   for (let i = 0; i < count; i++) {
-    const x = (Math.random() - 0.5) * 4.6;
+    const x = (Math.random() - 0.5) * 3.6;
     let y = (Math.random() - 0.5) * 0.06;
-    let z = (Math.random() - 0.5) * 2.6;
+    let z = (Math.random() - 0.5) * 2.2;
     const y2 = y * c - z * s;
     const z2 = y * s + z * c;
     out[i * 3 + 0] = x;
@@ -66,7 +66,7 @@ function candles(count) {
   for (let i = 0; i < N; i++) {
     const base = -0.85 + i * 0.14 + (Math.random() - 0.5) * 0.22;
     const height = 0.28 + Math.random() * 0.42;
-    params.push({ x: -1.9 + i * 0.345, base, height });
+    params.push({ x: -1.55 + i * 0.28, base, height });
   }
   const out = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
@@ -91,8 +91,8 @@ function network(count) {
   const nodes = [];
   for (let i = 0; i < N; i++) {
     nodes.push([
-      (Math.random() - 0.5) * 4.2,
-      (Math.random() - 0.5) * 2.6,
+      (Math.random() - 0.5) * 3.2,
+      (Math.random() - 0.5) * 2.4,
       (Math.random() - 0.5) * 1.0,
     ]);
   }
@@ -150,25 +150,59 @@ function envelope(count) {
 }
 
 function tabla(count) {
-  // dayan (smaller, left) + baya (bigger, right), tilted so the tops show
+  // baya (bigger, left) + dayan (smaller, right), tilted steeply so the
+  // drumheads face the viewer. Each head reads as a real tabla top:
+  // a dense kinar/gajra ring at the rim, a sparse maidan, and a clearly
+  // outlined syahi circle — off-center on the baya, centered on the dayan.
   const drums = [
-    { cx: -1.05, topR: 0.62, botR: 0.45, topY: 0.35, botY: -0.75 },
-    { cx: 0.95, topR: 0.85, botR: 0.62, topY: 0.2, botY: -0.8 },
+    { cx: -1.1, topR: 0.85, botR: 0.6, topY: 0.25, botY: -0.8, syahiR: 0.3, syX: -0.2 },
+    { cx: 0.95, topR: 0.6, botR: 0.42, topY: 0.35, botY: -0.7, syahiR: 0.22, syX: 0 },
   ];
-  const tilt = -0.5, c = Math.cos(tilt), s = Math.sin(tilt);
+  const tilt = -0.95, c = Math.cos(tilt), s = Math.sin(tilt);
+  const STRAPS = 9;
   const out = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
-    const d = drums[Math.random() < 0.45 ? 0 : 1];
+    const d = drums[Math.random() < 0.5 ? 0 : 1];
     let x, y, z;
-    if (Math.random() < 0.42) {
-      // drum head
-      const r = d.topR * Math.sqrt(Math.random());
+    const pick = Math.random();
+    if (pick < 0.24) {
+      // kinar + gajra: dense braided ring at the rim
+      const r = d.topR * (0.9 + Math.random() * 0.1);
       const a = Math.random() * Math.PI * 2;
+      x = d.cx + Math.cos(a) * r;
+      y = d.topY - Math.random() * 0.05;
+      z = Math.sin(a) * r;
+    } else if (pick < 0.4) {
+      // syahi edge: dense ring outlining the black paste circle
+      const r = d.syahiR * (0.88 + Math.random() * 0.12);
+      const a = Math.random() * Math.PI * 2;
+      x = d.cx + d.syX + Math.cos(a) * r;
+      y = d.topY + 0.02;
+      z = Math.sin(a) * r;
+    } else if (pick < 0.5) {
+      // syahi fill: light speckle inside the circle
+      const r = d.syahiR * 0.88 * Math.sqrt(Math.random());
+      const a = Math.random() * Math.PI * 2;
+      x = d.cx + d.syX + Math.cos(a) * r;
+      y = d.topY + 0.02;
+      z = Math.sin(a) * r;
+    } else if (pick < 0.68) {
+      // maidan: sparse skin between syahi and rim
+      const a = Math.random() * Math.PI * 2;
+      const r = d.topR * (0.2 + 0.7 * Math.sqrt(Math.random()));
       x = d.cx + Math.cos(a) * r;
       y = d.topY;
       z = Math.sin(a) * r;
+    } else if (pick < 0.86) {
+      // tasma: leather straps lacing down the body
+      const a = ((Math.random() * STRAPS) | 0) / STRAPS * Math.PI * 2 + 0.3;
+      const t = Math.random();
+      const r = d.botR + (d.topR - d.botR) * t;
+      x = d.cx + Math.cos(a) * r + (Math.random() - 0.5) * 0.03;
+      y = d.botY + (d.topY - d.botY) * t;
+      z = Math.sin(a) * r + (Math.random() - 0.5) * 0.03;
     } else {
-      // tapered body
+      // body shell: faint tapered drum wall
       const t = Math.random();
       const r = d.botR + (d.topR - d.botR) * t;
       const a = Math.random() * Math.PI * 2;
@@ -198,18 +232,21 @@ function knot(count) {
   return out;
 }
 
-// Order matches the [data-shape] sections in the DOM.
+// Order matches the [data-shape] sections in the DOM. Each slot carries a
+// tint so the particle field's color narrates the journey section by section;
+// tints stay desaturated so the system still reads as one palette.
+const WARM_WHITE = [0.949, 0.941, 0.918];
 export function buildShapes(count) {
   const orb = sphere(count);
   return [
-    { data: orb, offset: [0, 0, 0], dim: 1.0, type: TYPE.BREATH },          // hero
-    { data: orb, offset: [2.2, 0, -0.6], dim: 0.7, type: TYPE.BREATH },     // projects intro (orb glides right)
-    { data: waveField(count), offset: [1.7, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE },   // physics
-    { data: invader(count), offset: [1.7, 0, -0.4], dim: 0.55, type: TYPE.SWAY },       // ascenta
-    { data: candles(count), offset: [1.7, 0, -0.4], dim: 0.55, type: TYPE.SWAY },       // trading
-    { data: network(count), offset: [1.7, 0, -0.4], dim: 0.55, type: TYPE.SPIN },       // crm
-    { data: envelope(count), offset: [1.7, 0, -0.4], dim: 0.55, type: TYPE.SWAY },      // now
-    { data: tabla(count), offset: [1.6, 0.1, -0.4], dim: 0.65, type: TYPE.SWAY },       // tabla
-    { data: knot(count), offset: [0, 0, 0], dim: 1.0, type: TYPE.TUMBLE },  // contact
+    { data: orb, offset: [0, 0, 0], dim: 1.0, type: TYPE.BREATH, tint: WARM_WHITE },          // hero
+    { data: orb, offset: [2.0, 0, -0.6], dim: 0.7, type: TYPE.BREATH, tint: WARM_WHITE },     // projects intro (orb glides right)
+    { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, tint: [0.72, 0.88, 0.95] },  // physics — cool cyan
+    { data: invader(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.81, 0.76, 0.96] },      // ascenta — arcade violet
+    { data: candles(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.72, 0.92, 0.77] },      // trading — ticker green
+    { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, tint: [0.72, 0.81, 0.96] },      // crm — wire blue
+    { data: envelope(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.96, 0.90, 0.78] },     // now — paper cream
+    { data: tabla(count), offset: [1.3, 0.1, -0.4], dim: 0.65, type: TYPE.SWAY, tint: [0.96, 0.82, 0.64] },       // tabla — wood amber
+    { data: knot(count), offset: [0, 0, 0], dim: 1.0, type: TYPE.TUMBLE, tint: WARM_WHITE },  // contact
   ];
 }

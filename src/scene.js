@@ -46,6 +46,8 @@ export function createScene(canvas, { reducedMotion }) {
     uDimB: { value: slots[1].dim },
     uOffsetA: { value: new THREE.Vector3() },
     uOffsetB: { value: new THREE.Vector3() },
+    uTintA: { value: new THREE.Color().setRGB(...slots[0].tint) },
+    uTintB: { value: new THREE.Color().setRGB(...slots[1].tint) },
   };
 
   const material = new THREE.ShaderMaterial({
@@ -133,6 +135,9 @@ export function createScene(canvas, { reducedMotion }) {
       }
     `,
     fragmentShader: /* glsl */ `
+      uniform float uMorph;
+      uniform vec3 uTintA;
+      uniform vec3 uTintB;
       varying float vAlpha;
       varying float vHeat;
 
@@ -141,7 +146,7 @@ export function createScene(canvas, { reducedMotion }) {
         float d = length(uv);
         if (d > 0.5) discard;
         float glow = smoothstep(0.5, 0.0, d);
-        vec3 base = vec3(0.949, 0.941, 0.918);
+        vec3 base = mix(uTintA, uTintB, uMorph);
         vec3 hot  = vec3(1.0, 0.302, 0.18);
         vec3 color = mix(base, hot, clamp(vHeat * 2.2, 0.0, 1.0));
         gl_FragColor = vec4(color, glow * vAlpha);
@@ -162,6 +167,8 @@ export function createScene(canvas, { reducedMotion }) {
     uniforms.uTypeB.value = slots[Math.min(i + 1, slots.length - 1)].type;
     uniforms.uDimA.value = slots[i].dim;
     uniforms.uDimB.value = slots[Math.min(i + 1, slots.length - 1)].dim;
+    uniforms.uTintA.value.setRGB(...slots[i].tint);
+    uniforms.uTintB.value.setRGB(...slots[Math.min(i + 1, slots.length - 1)].tint);
     pairIdx = i;
   }
   writePair(0);
@@ -225,6 +232,17 @@ export function createScene(canvas, { reducedMotion }) {
 
     pulseEnergy *= 0.92;
     uniforms.uPulse.value = pulseEnergy;
+
+    // depth: camera drifts toward the pointer and sways slowly on its own,
+    // so the field reads as a 3D space even when nothing else is moving
+    if (!reducedMotion) {
+      const t = uniforms.uTime.value;
+      const tx = (hasMouse ? ndcMouse.x * 0.28 : 0) + Math.sin(t * 0.07) * 0.06;
+      const ty = (hasMouse ? ndcMouse.y * 0.18 : 0) + Math.cos(t * 0.09) * 0.05;
+      camera.position.x += (tx - camera.position.x) * 0.03;
+      camera.position.y += (ty - camera.position.y) * 0.03;
+      camera.lookAt(0, 0, 0);
+    }
 
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
