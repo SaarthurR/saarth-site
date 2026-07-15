@@ -239,7 +239,7 @@ const WARM_WHITE = [0.949, 0.941, 0.918];
 export function buildShapes(count) {
   const orb = sphere(count);
   return [
-    { data: orb, offset: [0, 0, 0], dim: 1.0, type: TYPE.BREATH, tint: WARM_WHITE },          // hero
+    { data: orb, offset: [0, 0, 0], dim: 0.9, scale: 0.72, type: TYPE.BREATH, tint: WARM_WHITE }, // hero — smaller so it frames the title instead of swallowing it
     { data: orb, offset: [2.0, 0, -0.6], dim: 0.7, type: TYPE.BREATH, tint: WARM_WHITE },     // projects intro (orb glides right)
     { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, tint: [0.72, 0.88, 0.95] },  // physics — cool cyan
     { data: invader(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.81, 0.76, 0.96] },      // ascenta — arcade violet

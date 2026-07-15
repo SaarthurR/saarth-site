@@ -212,6 +212,9 @@ main { position: relative; z-index: 1; }
   max-width: 1200px;
   margin: 0 auto;
 }
+/* travel room between pinned sections so each one glides in over real
+   scroll distance instead of popping in right behind the previous pin */
+.section[data-shape] { margin: 20vh auto; }
 .section-head {
   display: flex; align-items: baseline; gap: 1.5rem;
   margin-bottom: clamp(3rem, 6vw, 5rem);
@@ -220,6 +223,7 @@ main { position: relative; z-index: 1; }
   font-family: var(--font-mono);
   color: var(--accent);
   font-size: 0.9rem;
+  display: inline-block;
 }
 .section-title {
   font-size: clamp(2.4rem, 7vw, 5rem);
@@ -232,7 +236,7 @@ main { position: relative; z-index: 1; }
 
 /* ---------- Projects ---------- */
 .projects-intro {
-  min-height: 60vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
 }
@@ -297,7 +301,90 @@ main { position: relative; z-index: 1; }
 }
 .stat-num { font-variant-numeric: tabular-nums; }
 
+/* ---------- About ---------- */
+.about-text {
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.45;
+  max-width: 54rem;
+}
+.about-text .w { display: inline-block; will-change: opacity; }
+
+/* ---------- Stack ---------- */
+.stack-rows { display: flex; flex-direction: column; gap: clamp(0.4rem, 1.5vw, 1rem); }
+.stack-row {
+  font-size: clamp(2rem, 6.5vw, 5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  white-space: nowrap;
+  will-change: transform;
+}
+.stack-row:nth-child(even) {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(242, 240, 234, 0.55);
+}
+.stack-cat {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--accent);
+  -webkit-text-stroke: 0;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-right: 1.25rem;
+  vertical-align: middle;
+}
+
+/* ---------- Stats ---------- */
+.stats { padding-top: clamp(3rem, 6vw, 5rem); padding-bottom: clamp(3rem, 6vw, 5rem); }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: clamp(2rem, 5vw, 4rem) 0;
+}
+.stat { display: flex; flex-direction: column; gap: 0.5rem; }
+.stat-value {
+  font-size: clamp(2.6rem, 7vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- Giant name strip ---------- */
+.giant-strip { overflow: hidden; padding: clamp(2rem, 5vw, 4rem) 0; }
+.giant-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: clamp(5rem, 16vw, 14rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(242, 240, 234, 0.22);
+  will-change: transform;
+}
+
 /* ---------- Now ---------- */
+/* full viewport while pinned, so neighbors never slide past it mid-pin */
+.now {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 .now-text {
   font-size: clamp(1.4rem, 3.5vw, 2.4rem);
   font-weight: 500;
@@ -381,6 +468,7 @@ main { position: relative; z-index: 1; }
 
 /* ---------- Contact ---------- */
 .contact { text-align: left; padding-bottom: 3rem; }
+.section.contact { margin-bottom: 0; }
 .contact-title {
   font-size: clamp(3rem, 11vw, 8.5rem);
   font-weight: 700;
@@ -437,4 +525,5 @@ main { position: relative; z-index: 1; }
   .nav-links a { font-size: 0.72rem; letter-spacing: 0.02em; }
   .nav-cta { padding: 0.35rem 0.75rem !important; }
   .tabla-pads { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }

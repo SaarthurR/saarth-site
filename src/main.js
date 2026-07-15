@@ -6,6 +6,7 @@ import { createScene } from "./scene.js";
 import { playBol } from "./tabla.js";
 
 gsap.registerPlugin(ScrollTrigger);
+window.__ST = ScrollTrigger; // debug handle for the verify scripts
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -15,45 +16,187 @@ const sceneApi = createScene(document.getElementById("webgl"), { reducedMotion }
 /* ---------- Smooth scroll (Lenis + GSAP) ---------- */
 let lenis = null;
 if (!reducedMotion) {
-  lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+  // duration + expo easing = floaty glide: the page keeps drifting after the
+  // wheel stops instead of tracking the fingers 1:1
+  lenis = new Lenis({
+    duration: 2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+    wheelMultiplier: 0.9,
+  });
   lenis.on("scroll", ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
 }
 
-// Each [data-shape] section pins at viewport center for a short extra stretch
-// of scrolling. While pinned, its particle shape holds fully formed; the morph
-// to the next shape happens only during the travel between one section's pin
-// release and the next section's pin start.
-const shapeSections = gsap.utils.toArray("[data-shape]");
-const shapePins = shapeSections.map((section) =>
-  ScrollTrigger.create({
+/* ---------- Pinned sections ---------- */
+// Every pin is created strictly in DOM order. ScrollTrigger only bakes a
+// pin's spacer into triggers created after it, so creating the about pin out
+// of order pushed every section below it ~a full viewport out of sync: pins
+// grabbed sections before they reached center, reveals finished off-screen,
+// and about + projects pinned on top of each other.
+const aboutText = document.getElementById("aboutText");
+aboutText.innerHTML = aboutText.textContent.trim().split(/\s+/)
+  .map((w) => `<span class="w">${w}</span>`).join(" ");
+
+const EXIT = 0.3; // last 30vh of each pin window is the fly-out zone
+
+const shapePins = [];
+let aboutPin = null;
+gsap.utils.toArray("[data-shape], .about").forEach((section) => {
+  if (section.classList.contains("about")) {
+    // page holds still while the paragraph lights up word by word under the wheel
+    if (!reducedMotion) {
+      aboutPin = ScrollTrigger.create({
+        trigger: section,
+        start: "center center",
+        end: "+=90%",
+        pin: true,
+        scrub: true,
+        animation: gsap.fromTo("#aboutText .w", { opacity: 0.12 }, { opacity: 1, stagger: 0.08, ease: "none" }),
+      });
+    }
+    return;
+  }
+  // Each [data-shape] section pins at viewport center. The first stretch of
+  // the pin holds the content fully formed; the EXIT stretch flies it out, so
+  // the section is already empty before the next one scrolls into view.
+  shapePins.push(ScrollTrigger.create({
     trigger: section,
     start: "center center",
-    end: "+=40%",
+    end: "+=60%",
     pin: true,
-  })
-);
+  }));
+});
+
+// Where a section rests fully formed: the middle of the hold zone (pin window
+// minus the fly-out stretch). Contact and about never fly out.
+const restPoint = (pin) =>
+  pin === shapePins[shapePins.length - 1] || pin === aboutPin
+    ? (pin.start + pin.end) / 2
+    : pin.start + (pin.end - pin.start - window.innerHeight * EXIT) / 2;
 
 // If the user stops scrolling *near* a section's pin window, gently settle
-// onto its center. Proximity (not mandatory) snap: stopping anywhere else —
-// hero, footer, halfway between sections — leaves the page exactly where the
-// user left it, so scrolling never feels hijacked.
+// onto its rest point. Proximity (not mandatory) snap: stopping anywhere
+// else — hero, footer, halfway between sections — leaves the page exactly
+// where the user left it, so scrolling never feels hijacked.
 if (lenis) {
   const snap = new Snap(lenis, {
     type: "proximity",
-    distanceThreshold: "20%",
+    distanceThreshold: "25%",
     debounce: 500,
-    duration: 0.6,
+    duration: 1.1,
     easing: (t) => 1 - Math.pow(1 - t, 3),
   });
   let removeSnaps = [];
   const rebuildSnaps = () => {
     removeSnaps.forEach((remove) => remove());
-    removeSnaps = shapePins.map((p) => snap.add((p.start + p.end) / 2));
+    removeSnaps = shapePins.map((p) => snap.add(restPoint(p)));
   };
   rebuildSnaps();
   ScrollTrigger.addEventListener("refresh", rebuildSnaps); // pin positions move on resize
+}
+
+// ScrollTrigger pushes triggers created after a pin past that pin's spacer,
+// even when the trigger element lives INSIDE the pinned section — so reveals
+// there would fire only after the pin releases. Anchor those to the pin's own
+// scroll position instead of the element.
+const pinOf = (el) => {
+  const sec = el.closest("[data-shape], .about");
+  if (!sec) return null;
+  return shapePins.find((p) => p.trigger === sec)
+    || (aboutPin && aboutPin.trigger === sec ? aboutPin : null);
+};
+const revealAt = (el) => {
+  const pin = pinOf(el);
+  // reverse on the way back up so re-entering a section replays its reveal
+  // instead of popping stale end-states into place
+  return pin
+    ? { start: () => pin.start - window.innerHeight * 0.4, toggleActions: "play none none reverse" }
+    : { trigger: el, start: "top 88%", toggleActions: "play none none reverse" };
+};
+
+/* ---------- Scroll theatrics ---------- */
+let heroBlown = false; // magnet effect stands down while the title is scattering
+if (!reducedMotion) {
+  // hero title blows apart letter by letter during the tail of its pin — each
+  // char rips off at its own moment, so it reads as wind instead of a fade
+  const heroPin = shapePins[0];
+  gsap.timeline({
+    scrollTrigger: {
+      start: () => heroPin.end - window.innerHeight * EXIT,
+      end: () => heroPin.end,
+      scrub: true,
+      onUpdate: (self) => { heroBlown = self.progress > 0; },
+    },
+  })
+    .to(".hero-char", {
+      x: () => gsap.utils.random(-520, 520),
+      y: () => gsap.utils.random(-480, -140),
+      rotation: () => gsap.utils.random(-220, 220),
+      scale: () => gsap.utils.random(0.2, 1.3),
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.in",
+      stagger: { each: 0.05, from: "random" },
+    }, 0)
+    .to(".hero-eyebrow, .hero-sub, .hero-scroll", { opacity: 0, y: -80, ease: "power1.in", duration: 0.7 }, 0);
+
+  // every other pinned section (except the last) flies its content upward
+  // during the tail of its own pin — while it still owns the whole viewport,
+  // never on top of the next section
+  shapePins.slice(1, -1).forEach((pin) => {
+    gsap.to(Array.from(pin.trigger.children), {
+      y: -130,
+      rotation: -3,
+      opacity: 0,
+      stagger: 0.08,
+      ease: "power1.in",
+      scrollTrigger: {
+        start: () => pin.end - window.innerHeight * EXIT,
+        end: () => pin.end,
+        scrub: true,
+      },
+    });
+  });
+
+  // stack rows shear past each other in alternating directions
+  gsap.utils.toArray(".stack-row").forEach((row, i) => {
+    const dir = i % 2 ? 1 : -1;
+    gsap.fromTo(row,
+      { xPercent: 9 * dir, rotation: 2.5 * dir },
+      {
+        xPercent: -9 * dir,
+        rotation: -2.5 * dir,
+        ease: "none",
+        scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: true },
+      });
+    gsap.from(row, {
+      opacity: 0,
+      duration: 0.8,
+      scrollTrigger: { trigger: row, start: "top 92%", toggleActions: "play none none reverse" },
+    });
+  });
+
+  // giant outlined name drags sideways with the scroll
+  gsap.fromTo(".giant-text", { xPercent: 2 }, {
+    xPercent: -32,
+    ease: "none",
+    scrollTrigger: { trigger: ".giant-strip", start: "top bottom", end: "bottom top", scrub: true },
+  });
+
+  // velocity skew: content leans into fast scrolls, settles when you stop
+  const skewSetter = gsap.quickSetter(".skew", "skewY", "deg");
+  let skew = 0;
+  let skewTarget = 0;
+  lenis.on("scroll", ({ velocity }) => {
+    skewTarget = gsap.utils.clamp(-4, 4, velocity * 0.06);
+  });
+  gsap.ticker.add(() => {
+    skewTarget *= 0.92;
+    skew += (skewTarget - skew) * 0.12;
+    skewSetter(skew);
+  });
 }
 
 gsap.ticker.add(() => {
@@ -117,6 +260,7 @@ window.addEventListener("load", runIntro);
 if (!reducedMotion && matchMedia("(hover: hover)").matches) {
   const chars = document.querySelectorAll(".hero-char");
   window.addEventListener("pointermove", (e) => {
+    if (heroBlown) return; // don't fight the scroll-scrubbed scatter
     chars.forEach((ch) => {
       const r = ch.getBoundingClientRect();
       const cx = r.left + r.width / 2;
@@ -150,7 +294,7 @@ gsap.utils.toArray(".reveal-line .inner").forEach((el) => {
     yPercent: 110,
     duration: 1,
     ease: "power4.out",
-    scrollTrigger: { trigger: el, start: "top 88%" },
+    scrollTrigger: revealAt(el),
   });
 });
 
@@ -160,19 +304,55 @@ gsap.utils.toArray(".reveal-block").forEach((el) => {
     opacity: 0,
     duration: 1,
     ease: "power3.out",
-    scrollTrigger: { trigger: el, start: "top 85%" },
+    scrollTrigger: revealAt(el),
   });
 });
 
-// projects glide in from the left as their section centers
-gsap.utils.toArray(".project").forEach((el) => {
+// project cards swing up from below, scrubbed to the scroll, settling flat
+// exactly as the section locks into its pin
+gsap.utils.toArray(".project-view").forEach((sec, i) => {
+  const pin = shapePins.find((p) => p.trigger === sec);
+  gsap.fromTo(sec.querySelector(".project"),
+    { y: 180, rotation: i % 2 ? 7 : -7, scale: 0.8, opacity: 0 },
+    {
+      y: 0,
+      rotation: 0,
+      scale: 1,
+      opacity: 1,
+      ease: "none",
+      scrollTrigger: {
+        // wide approach window + scrub smoothing so the card visibly glides
+        // in and settles just before the pin locks, even mid-snap-glide
+        start: () => pin.start - window.innerHeight * 0.55,
+        end: () => pin.start - window.innerHeight * 0.08,
+        scrub: 0.8,
+      },
+    });
+});
+
+// index numbers spin in
+gsap.utils.toArray(".section-index, .project-num").forEach((el) => {
   gsap.from(el, {
-    x: -80,
+    rotation: 270,
+    scale: 0,
     opacity: 0,
-    duration: 1,
-    ease: "power3.out",
-    scrollTrigger: { trigger: el, start: "top 75%" },
+    duration: 0.9,
+    ease: "back.out(1.7)",
+    scrollTrigger: revealAt(el),
   });
+});
+
+// stat tiles flip up like departure-board cards
+gsap.from(".stat", {
+  yPercent: 80,
+  opacity: 0,
+  rotateX: -70,
+  transformPerspective: 700,
+  transformOrigin: "center top",
+  stagger: 0.12,
+  duration: 1,
+  ease: "power3.out",
+  scrollTrigger: { trigger: ".stats-grid", start: "top 82%", toggleActions: "play none none reverse" },
 });
 
 /* ---------- Animated stat counters ---------- */
@@ -184,7 +364,7 @@ gsap.utils.toArray(".stat-num").forEach((el) => {
     v: target,
     duration: 1.6,
     ease: "power2.out",
-    scrollTrigger: { trigger: el, start: "top 90%" },
+    scrollTrigger: revealAt(el),
     onUpdate: () => { el.textContent = obj.v.toFixed(decimals); },
   });
 });
@@ -192,7 +372,18 @@ gsap.utils.toArray(".stat-num").forEach((el) => {
 /* ---------- Marquee ---------- */
 if (!reducedMotion) {
   const track = document.getElementById("marqueeTrack");
-  gsap.to(track, { xPercent: -50, ease: "none", duration: 22, repeat: -1 });
+  const marqueeTween = gsap.to(track, { xPercent: -50, ease: "none", duration: 22, repeat: -1 });
+  // scroll velocity whips the marquee faster; scrolling up runs it backwards
+  let ts = 1;
+  let tsTarget = 1;
+  lenis?.on("scroll", ({ velocity }) => {
+    tsTarget = gsap.utils.clamp(-6, 6, 1 + velocity * 0.09);
+  });
+  gsap.ticker.add(() => {
+    tsTarget += (1 - tsTarget) * 0.04;
+    ts += (tsTarget - ts) * 0.1;
+    marqueeTween.timeScale(ts);
+  });
 }
 
 /* ---------- Custom cursor ---------- */
@@ -264,8 +455,7 @@ pads.forEach((pad) => pad.addEventListener("pointerdown", () => hitPad(pad)));
 // one-time "come play" ripple across the pads when they scroll into view
 if (!reducedMotion && pads.length) {
   ScrollTrigger.create({
-    trigger: ".tabla-pads",
-    start: "top 85%",
+    ...revealAt(document.querySelector(".tabla-pads")),
     once: true,
     onEnter: () => {
       gsap.fromTo(".pad",
@@ -292,17 +482,16 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
     const target = document.querySelector(a.getAttribute("href"));
     if (!target) return;
     // pinned sections live inside pin-spacers, so jump to the pin's
-    // scroll position rather than the element itself
-    // land on the middle of the pin window so the section sits centered
-    // without relying on the snap to correct afterwards
-    const pin = shapePins.find((p) => p.trigger === target);
+    // rest point (mid-hold, before the fly-out) rather than the element
+    const pin = shapePins.find((p) => p.trigger === target)
+      || (aboutPin && aboutPin.trigger === target ? aboutPin : null);
     if (lenis) {
       e.preventDefault();
-      if (pin) lenis.scrollTo((pin.start + pin.end) / 2);
+      if (pin) lenis.scrollTo(restPoint(pin));
       else lenis.scrollTo(target, { offset: -40 });
     } else if (pin) {
       e.preventDefault();
-      window.scrollTo(0, (pin.start + pin.end) / 2);
+      window.scrollTo(0, restPoint(pin));
     }
   });
 });

@@ -31,6 +31,7 @@
   <nav class="nav">
     <a href="#top" class="nav-logo" data-cursor="hover">S/</a>
     <div class="nav-links">
+      <a href="#about" data-cursor="hover">About</a>
       <a href="#projects" data-cursor="hover">Projects</a>
       <a href="#now" data-cursor="hover">Now</a>
       <a href="#tabla" data-cursor="hover">Tabla</a>
@@ -70,16 +71,25 @@
       </div>
     </div>
 
+    <!-- ABOUT -->
+    <section class="section about" id="about">
+      <div class="section-head">
+        <span class="section-index">01</span>
+        <h2 class="section-title"><span class="reveal-line">The short</span> <span class="reveal-line">version</span></h2>
+      </div>
+      <p class="about-text skew" id="aboutText">I'm Saarth. I'm 14, and I'd rather ship something real than talk about shipping it. A physics site my sister's college classmates actually use. A CRM built because my spreadsheet died at 400 emails. A trading system that runs while I'm in class. Demos are easy. Live is the whole point.</p>
+    </section>
+
     <!-- PROJECTS INTRO -->
     <section class="section projects-intro" id="projects" data-shape>
       <div class="section-head">
-        <span class="section-index">01</span>
+        <span class="section-index">02</span>
         <h2 class="section-title"><span class="reveal-line">Things I've</span> <span class="reveal-line">shipped</span></h2>
       </div>
     </section>
 
     <section class="section project-view" id="physics" data-shape>
-      <a class="project" href="https://physics7c.vercel.app" target="_blank" rel="noopener" data-cursor="view">
+      <a class="project skew" href="https://physics7c.vercel.app" target="_blank" rel="noopener" data-cursor="view">
         <div class="project-meta">
           <span class="project-num">P.01</span>
           <span class="project-tag">education</span>
@@ -91,7 +101,7 @@
     </section>
 
     <section class="section project-view" id="ascenta" data-shape>
-      <a class="project" href="https://ascenta3.vercel.app" target="_blank" rel="noopener" data-cursor="view">
+      <a class="project skew" href="https://ascenta3.vercel.app" target="_blank" rel="noopener" data-cursor="view">
         <div class="project-meta">
           <span class="project-num">P.02</span>
           <span class="project-tag">platform</span>
@@ -103,7 +113,7 @@
     </section>
 
     <section class="section project-view" id="trading" data-shape>
-      <div class="project" data-cursor="hover" tabindex="0">
+      <div class="project skew" data-cursor="hover" tabindex="0">
         <div class="project-meta">
           <span class="project-num">P.03</span>
           <span class="project-tag">finance</span>
@@ -115,7 +125,7 @@
     </section>
 
     <section class="section project-view" id="crm" data-shape>
-      <div class="project" data-cursor="hover" tabindex="0">
+      <div class="project skew" data-cursor="hover" tabindex="0">
         <div class="project-meta">
           <span class="project-num">P.04</span>
           <span class="project-tag">internal tool</span>
@@ -125,13 +135,43 @@
       </div>
     </section>
 
+    <!-- STACK -->
+    <section class="section stack" id="stack">
+      <div class="section-head">
+        <span class="section-index">03</span>
+        <h2 class="section-title"><span class="reveal-line">Built</span> <span class="reveal-line">with</span></h2>
+      </div>
+      <div class="stack-rows" aria-label="Tools I use">
+        <div class="stack-row skew"><span class="stack-cat">web</span>React · TypeScript</div>
+        <div class="stack-row skew"><span class="stack-cat">backend</span>Node · Gmail API</div>
+        <div class="stack-row skew"><span class="stack-cat">trading</span>Python · ib_insync</div>
+        <div class="stack-row skew"><span class="stack-cat">motion</span>Three.js · GSAP</div>
+        <div class="stack-row skew"><span class="stack-cat">ship</span>Vite · Vercel</div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="section stats" id="stats">
+      <div class="stats-grid skew">
+        <div class="stat"><span class="stat-value"><span class="stat-num stat-big" data-count="14">0</span></span><span class="stat-label">years old</span></div>
+        <div class="stat"><span class="stat-value"><span class="stat-num stat-big" data-count="400">0</span>+</span><span class="stat-label">cold emails sent</span></div>
+        <div class="stat"><span class="stat-value"><span class="stat-num stat-big" data-count="90.7">0</span>%</span><span class="stat-label">backtest win rate</span></div>
+        <div class="stat"><span class="stat-value"><span class="stat-num stat-big" data-count="2">0</span></span><span class="stat-label">internships right now</span></div>
+      </div>
+    </section>
+
+    <!-- GIANT NAME STRIP -->
+    <div class="giant-strip" aria-hidden="true">
+      <span class="giant-text">SAARTH RANKA — SAARTH RANKA — SAARTH RANKA —&nbsp;</span>
+    </div>
+
     <!-- NOW -->
     <section class="section now" id="now" data-shape>
       <div class="section-head">
-        <span class="section-index">02</span>
+        <span class="section-index">04</span>
         <h2 class="section-title"><span class="reveal-line">Currently</span></h2>
       </div>
-      <p class="now-text reveal-block">
+      <p class="now-text reveal-block skew">
         Interning at <strong>Frizzle</strong> <span class="yc-badge">YC</span>, building cold email infrastructure for schools, and at <strong>DeepAware AI</strong>. At scale, for real this time.
       </p>
     </section>
@@ -139,10 +179,10 @@
     <!-- TABLA -->
     <section class="section tabla" id="tabla" data-shape>
       <div class="section-head">
-        <span class="section-index">03</span>
+        <span class="section-index">05</span>
         <h2 class="section-title"><span class="reveal-line">Off the</span> <span class="reveal-line">screen</span></h2>
       </div>
-      <p class="tabla-text reveal-block">
+      <p class="tabla-text reveal-block skew">
         I've played tabla for years. Performed, taught, the works.
         It's the one thing I do that has nothing to do with a screen. <em>Except right now. Try it:</em>
       </p>
@@ -157,8 +197,8 @@
 
     <!-- CONTACT -->
     <section class="section contact" id="contact" data-shape>
-      <span class="section-index">04</span>
-      <h2 class="contact-title">
+      <span class="section-index">06</span>
+      <h2 class="contact-title skew">
         <span class="reveal-line">Let's build</span>
         <span class="reveal-line">something.</span>
       </h2>

@@ -42,6 +42,8 @@ export function createScene(canvas, { reducedMotion }) {
     uMorph: { value: 0 },
     uTypeA: { value: slots[0].type },
     uTypeB: { value: slots[1].type },
+    uScaleA: { value: slots[0].scale ?? 1 },
+    uScaleB: { value: slots[1].scale ?? 1 },
     uDimA: { value: slots[0].dim },
     uDimB: { value: slots[1].dim },
     uOffsetA: { value: new THREE.Vector3() },
@@ -63,6 +65,8 @@ export function createScene(canvas, { reducedMotion }) {
       uniform float uMorph;
       uniform float uTypeA;
       uniform float uTypeB;
+      uniform float uScaleA;
+      uniform float uScaleB;
       uniform float uDimA;
       uniform float uDimB;
       uniform vec3 uOffsetA;
@@ -103,8 +107,8 @@ export function createScene(canvas, { reducedMotion }) {
       }
 
       void main() {
-        vec3 a = animate(aShapeA, uTypeA, aRandom) + uOffsetA;
-        vec3 b = animate(aShapeB, uTypeB, aRandom) + uOffsetB;
+        vec3 a = animate(aShapeA * uScaleA, uTypeA, aRandom) + uOffsetA;
+        vec3 b = animate(aShapeB * uScaleB, uTypeB, aRandom) + uOffsetB;
 
         // particles travel at slightly different speeds for a dissolve feel
         float m = clamp(uMorph + (aRandom - 0.5) * 0.25, 0.0, 1.0);
@@ -165,6 +169,8 @@ export function createScene(canvas, { reducedMotion }) {
     shapeB.needsUpdate = true;
     uniforms.uTypeA.value = slots[i].type;
     uniforms.uTypeB.value = slots[Math.min(i + 1, slots.length - 1)].type;
+    uniforms.uScaleA.value = slots[i].scale ?? 1;
+    uniforms.uScaleB.value = slots[Math.min(i + 1, slots.length - 1)].scale ?? 1;
     uniforms.uDimA.value = slots[i].dim;
     uniforms.uDimB.value = slots[Math.min(i + 1, slots.length - 1)].dim;
     uniforms.uTintA.value.setRGB(...slots[i].tint);
