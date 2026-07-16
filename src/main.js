@@ -239,13 +239,14 @@ function runIntro() {
       ease: "power4.inOut",
       onComplete: () => preloader.remove(),
     })
-    .from(".hero-char", {
+    .from(reducedMotion ? ".hero-char" : ".hero-row:not(.hero-row-swap) .hero-char", {
       yPercent: 120,
       rotateX: -90,
       stagger: 0.06,
       duration: 1,
       ease: "back.out(1.4)",
     }, "-=0.35")
+    .addLabel("cycle")
     .from(".hero-eyebrow .line, .hero-sub .line", {
       y: 24,
       opacity: 0,
@@ -253,6 +254,54 @@ function runIntro() {
       duration: 0.7,
     }, "-=0.6")
     .from(".nav, .hero-scroll", { opacity: 0, duration: 0.6 }, "-=0.4");
+
+  if (!reducedMotion) {
+    // slot reel: one continuous scroll through the portfolio that decelerates
+    // straight into REAL THINGS — no per-word stops. A light box frames the
+    // reel while it rolls, then fades once it lands. The real chars stay in
+    // the DOM (display:none) so the magnet and blow-away tweens keep working;
+    // the reel's last item copies .hero-row metrics so the swap is seamless.
+    // leading "" = empty cell so the reel starts blank until I SHIP has landed
+    const words = ["", "TRADING BOTS", "STUDY SITES", "BACKTESTS", "CRMs",
+      "PHYSICS SIMS", "PROXIED SITES", "EMAIL TOOLS", "GAME SITES", "STRATEGIES",
+      "DASHBOARDS", "TABLA LOOPS", "LIVE SYSTEMS", "ROBOT CODE", "PHYSICAL AI",
+      "REAL THINGS"];
+    const row = document.querySelector(".hero-row-swap");
+    const finalWords = row.querySelectorAll(".hero-word");
+    const reel = document.createElement("span");
+    reel.className = "hero-reel";
+    reel.innerHTML =
+      '<span class="hero-reel-win"><span class="hero-reel-track">' +
+      words.map((w, i) =>
+        `<span class="hero-reel-item${i < words.length - 1 ? " is-mid" : ""}">` +
+        w.split(" ").map((p) => `<span>${p}</span>`).join("") +
+        "</span>").join("") +
+      '</span></span><span class="hero-reel-box"></span>';
+    gsap.set(finalWords, { display: "none" });
+    row.appendChild(reel);
+    const track = reel.querySelector(".hero-reel-track");
+    const box = reel.querySelector(".hero-reel-box");
+
+    // sequence: box fades in with the first word → two slow ticks that pick up
+    // speed → continuous blurred spin decelerating into REAL THINGS → box
+    // fades as it lands
+    const n = words.length;
+    const at = (i) => -100 * i / n; // yPercent that centers item i in the window
+    const ct = gsap.timeline();
+    ct.to(box, { opacity: 1, duration: 0.6, ease: "power1.inOut" }, 0)
+      .to(track, { yPercent: at(1), duration: 0.55, ease: "power3.out" }, 0)
+      .to(track, { yPercent: at(2), duration: 0.65, ease: "power1.inOut" }, 1.05)
+      .to(track, { yPercent: at(3), duration: 0.45, ease: "power1.inOut" }, 1.85)
+      .to(track, { yPercent: at(n - 1), duration: 1.9, ease: "power2.inOut" }, 2.4)
+      .to(track, { filter: "blur(8px)", duration: 0.45, ease: "power2.in" }, 2.55)
+      .to(track, { filter: "blur(0px)", duration: 0.6, ease: "power2.out" }, 3.7)
+      .to(box, { opacity: 0, duration: 0.35 }, 4.25)
+      .call(() => {
+        reel.remove();
+        gsap.set(finalWords, { clearProps: "display" });
+      });
+    tl.add(ct, "cycle");
+  }
 }
 window.addEventListener("load", runIntro);
 

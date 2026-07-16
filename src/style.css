@@ -160,6 +160,12 @@ main { position: relative; z-index: 1; }
 .hero-row { display: flex; gap: 0.22em; }
 .hero-word { display: flex; }
 .hero-char { display: inline-block; will-change: transform; }
+.hero-reel { position: relative; display: inline-block; }
+.hero-reel-win { display: block; height: 0.98em; overflow: hidden; }
+.hero-reel-track { display: flex; flex-direction: column; will-change: transform, filter; }
+.hero-reel-item { display: flex; gap: 0.22em; height: 0.98em; align-items: center; justify-content: center; color: var(--ink); white-space: nowrap; }
+.hero-reel-item.is-mid { font-size: 0.8em; height: 1.225em; color: var(--accent); }
+.hero-reel-box { position: absolute; inset: -0.09em -0.24em; border: 3px solid rgba(242, 240, 234, 0.85); border-radius: 0.1em; opacity: 0; pointer-events: none; }
 .hero-sub {
   margin-top: 2rem;
   font-size: clamp(1rem, 2.2vw, 1.35rem);
