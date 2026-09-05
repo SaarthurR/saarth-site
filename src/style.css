@@ -311,7 +311,9 @@ main { position: relative; z-index: 1; }
 .about-text .w { display: inline-block; will-change: opacity; }
 
 /* ---------- Stack ---------- */
-.stack-rows { display: flex; flex-direction: column; gap: clamp(0.4rem, 1.5vw, 1rem); }
+.stack-rows { display: flex; flex-direction: column; gap: clamp(0.4rem, 1.5vw, 1rem);
+  /* rows are nowrap by design; clip instead of pushing the page sideways */
+  overflow-x: clip; }
 .stack-row {
   font-size: clamp(2rem, 6.5vw, 5rem);
   font-weight: 700;

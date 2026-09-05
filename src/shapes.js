@@ -217,6 +217,42 @@ function tabla(count) {
   return out;
 }
 
+// a jointed robot arm on a base plate, gripper open at the tip
+function arm(count) {
+  const joints = [[-1.05, -1.15], [-1.05, -0.25], [0.05, 0.6], [1.05, 0.05]];
+  const segs = [];
+  for (let i = 0; i < joints.length - 1; i++) segs.push([joints[i], joints[i + 1]]);
+  segs.push([[1.05, 0.05], [1.6, 0.45]], [[1.05, 0.05], [1.6, -0.3]]); // gripper fingers
+  const lens = segs.map(([a, b]) => Math.hypot(b[0] - a[0], b[1] - a[1]));
+  const total = lens.reduce((s, l) => s + l, 0);
+  const out = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const r = Math.random();
+    if (r < 0.18) { // joint pucks
+      const j = joints[(Math.random() * joints.length) | 0];
+      const a = Math.random() * Math.PI * 2, rr = 0.17 * Math.sqrt(Math.random());
+      out[i * 3 + 0] = j[0] + Math.cos(a) * rr;
+      out[i * 3 + 1] = j[1] + Math.sin(a) * rr;
+      out[i * 3 + 2] = (Math.random() - 0.5) * 0.2;
+      continue;
+    }
+    if (r < 0.29) { // base plate
+      out[i * 3 + 0] = -1.05 + (Math.random() - 0.5) * 1.15;
+      out[i * 3 + 1] = -1.35 + (Math.random() - 0.5) * 0.16;
+      out[i * 3 + 2] = (Math.random() - 0.5) * 0.22;
+      continue;
+    }
+    let pick = Math.random() * total, si = 0;
+    while (pick > lens[si]) { pick -= lens[si]; si++; }
+    const [a, b] = segs[si];
+    const t = pick / lens[si];
+    out[i * 3 + 0] = a[0] + (b[0] - a[0]) * t + (Math.random() - 0.5) * 0.05;
+    out[i * 3 + 1] = a[1] + (b[1] - a[1]) * t + (Math.random() - 0.5) * 0.05;
+    out[i * 3 + 2] = (Math.random() - 0.5) * 0.1;
+  }
+  return out;
+}
+
 function knot(count) {
   const out = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
@@ -241,11 +277,13 @@ export function buildShapes(count) {
   return [
     { data: orb, offset: [0, 0, 0], dim: 0.9, scale: 0.72, type: TYPE.BREATH, tint: WARM_WHITE }, // hero — smaller so it frames the title instead of swallowing it
     { data: orb, offset: [2.0, 0, -0.6], dim: 0.7, type: TYPE.BREATH, tint: WARM_WHITE },     // projects intro (orb glides right)
+    { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, tint: [0.96, 0.79, 0.66] },      // juber — route orange
+    { data: arm(count), offset: [1.3, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.82, 0.86, 0.92] },           // robotics — steel
     { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, tint: [0.72, 0.88, 0.95] },  // physics — cool cyan
     { data: invader(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.81, 0.76, 0.96] },      // ascenta — arcade violet
     { data: candles(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.72, 0.92, 0.77] },      // trading — ticker green
-    { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, tint: [0.72, 0.81, 0.96] },      // crm — wire blue
-    { data: envelope(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.96, 0.90, 0.78] },     // now — paper cream
+    { data: envelope(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.72, 0.81, 0.96] },     // crm — mail blue
+    { data: orb, offset: [1.5, 0, -0.5], dim: 0.6, type: TYPE.BREATH, tint: [0.96, 0.90, 0.78] },                 // now — paper cream
     { data: tabla(count), offset: [1.3, 0.1, -0.4], dim: 0.65, type: TYPE.SWAY, tint: [0.96, 0.82, 0.64] },       // tabla — wood amber
     { data: knot(count), offset: [0, 0, 0], dim: 1.0, type: TYPE.TUMBLE, tint: WARM_WHITE },  // contact
   ];
