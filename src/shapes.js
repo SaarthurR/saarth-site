@@ -268,24 +268,27 @@ function knot(count) {
   return out;
 }
 
-// Order matches the [data-shape] sections in the DOM. Each slot carries a
-// tint so the particle field's color narrates the journey section by section;
-// tints stay desaturated so the system still reads as one palette.
-const WARM_WHITE = [0.949, 0.941, 0.918];
+// Order matches the [data-shape] sections in the DOM. Each slot has an
+// accent: the UI takes it as --accent, the particles take a lighter mix of it,
+// so the color changes section by section as you scroll.
+const tone = (hex, mix = 0.6) => {
+  const accent = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  return { accent, tint: accent.map((v) => 1 - (1 - v) * mix) };
+};
 export function buildShapes(count) {
   const orb = sphere(count);
   return [
-    { data: orb, offset: [0, 0, 0], dim: 0.9, scale: 0.72, type: TYPE.BREATH, tint: WARM_WHITE }, // hero — smaller so it frames the title instead of swallowing it
-    { data: orb, offset: [2.0, 0, -0.6], dim: 0.7, type: TYPE.BREATH, tint: WARM_WHITE },     // projects intro (orb glides right)
-    { data: orb, offset: [1.4, 0, -0.4], dim: 0.6, scale: 0.8, type: TYPE.BREATH, tint: [0.80, 0.78, 0.96] }, // atticus — its own orb, voice violet
-    { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, tint: [0.96, 0.79, 0.66] },      // juber — route orange
-    { data: arm(count), offset: [1.3, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.82, 0.86, 0.92] },           // robotics — steel
-    { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, tint: [0.72, 0.88, 0.95] },  // physics — cool cyan
-    { data: invader(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.81, 0.76, 0.96] },      // ascenta — arcade violet
-    { data: candles(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.72, 0.92, 0.77] },      // trading — ticker green
-    { data: envelope(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.72, 0.81, 0.96] },     // crm — mail blue
-    { data: orb, offset: [1.5, 0, -0.5], dim: 0.6, type: TYPE.BREATH, tint: [0.96, 0.90, 0.78] },                 // now — paper cream
-    { data: tabla(count), offset: [1.3, 0.1, -0.4], dim: 0.65, type: TYPE.SWAY, tint: [0.96, 0.82, 0.64] },       // tabla — wood amber
-    { data: knot(count), offset: [0, 0, 0], dim: 1.0, type: TYPE.TUMBLE, tint: WARM_WHITE },  // contact
+    { data: orb, offset: [0, 0, 0], dim: 0.9, scale: 0.72, type: TYPE.BREATH, ...tone("#ff5a36", 0.3) }, // hero — smaller so it frames the title instead of swallowing it
+    { data: orb, offset: [2.0, 0, -0.6], dim: 0.7, type: TYPE.BREATH, ...tone("#ff6b8b", 0.45) },     // projects intro (orb glides right)
+    { data: orb, offset: [1.4, 0, -0.4], dim: 0.6, scale: 0.8, type: TYPE.BREATH, ...tone("#8f7bff") }, // atticus — its own orb, voice violet
+    { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, ...tone("#ffa040") },      // juber — route amber
+    { data: arm(count), offset: [1.3, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#5ec8ff") },           // robotics — sky
+    { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, ...tone("#2ee6c8") },  // physics — teal
+    { data: invader(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#c86bff") },      // ascenta — arcade purple
+    { data: candles(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#3ddc84") },      // trading — ticker green
+    { data: envelope(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#4f8bff") },     // crm — mail blue
+    { data: orb, offset: [1.5, 0, -0.5], dim: 0.6, type: TYPE.BREATH, ...tone("#ffd166", 0.5) },            // now — gold
+    { data: tabla(count), offset: [1.3, 0.1, -0.4], dim: 0.65, type: TYPE.SWAY, ...tone("#ff8a5c") },       // tabla — wood
+    { data: knot(count), offset: [0, 0, 0], dim: 1.0, type: TYPE.TUMBLE, ...tone("#ff5a36", 0.35) },  // contact
   ];
 }

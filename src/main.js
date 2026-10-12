@@ -19,7 +19,7 @@ if (!reducedMotion) {
   // duration + expo easing = floaty glide: the page keeps drifting after the
   // wheel stops instead of tracking the fingers 1:1
   lenis = new Lenis({
-    duration: 2,
+    duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
     wheelMultiplier: 0.9,
@@ -147,8 +147,7 @@ if (!reducedMotion) {
   // never on top of the next section
   shapePins.slice(1, -1).forEach((pin) => {
     gsap.to(Array.from(pin.trigger.children), {
-      y: -130,
-      rotation: -3,
+      y: -80,
       opacity: 0,
       stagger: 0.08,
       ease: "power1.in",
@@ -178,19 +177,12 @@ if (!reducedMotion) {
     });
   });
 
-  // giant outlined name drags sideways with the scroll
-  gsap.fromTo(".giant-text", { xPercent: 2 }, {
-    xPercent: -32,
-    ease: "none",
-    scrollTrigger: { trigger: ".giant-strip", start: "top bottom", end: "bottom top", scrub: true },
-  });
-
   // velocity skew: content leans into fast scrolls, settles when you stop
   const skewSetter = gsap.quickSetter(".skew", "skewY", "deg");
   let skew = 0;
   let skewTarget = 0;
   lenis.on("scroll", ({ velocity }) => {
-    skewTarget = gsap.utils.clamp(-4, 4, velocity * 0.06);
+    skewTarget = gsap.utils.clamp(-1.5, 1.5, velocity * 0.03);
   });
   gsap.ticker.add(() => {
     skewTarget *= 0.92;
@@ -199,6 +191,7 @@ if (!reducedMotion) {
   });
 }
 
+let lastAccent = "";
 gsap.ticker.add(() => {
   const y = window.scrollY;
   const n = shapePins.length;
@@ -217,6 +210,9 @@ gsap.ticker.add(() => {
     }
   }
   sceneApi.setProgress(f);
+  // UI accent follows the particle color, so each section brings its own hue
+  const accent = `rgb(${sceneApi.accent().map((v) => Math.round(v * 255)).join(" ")})`;
+  if (accent !== lastAccent) document.documentElement.style.setProperty("--accent", (lastAccent = accent));
 });
 
 /* ---------- Preloader + hero intro ---------- */
@@ -229,7 +225,7 @@ function runIntro() {
 
   tl.to(counter, {
     v: 100,
-    duration: reducedMotion ? 0.01 : 1.4,
+    duration: reducedMotion ? 0.01 : 0.7,
     ease: "power2.inOut",
     onUpdate: () => { countEl.textContent = String(Math.round(counter.v)).padStart(2, "0"); },
   })
@@ -313,7 +309,7 @@ gsap.utils.toArray(".reveal-block").forEach((el) => {
 gsap.utils.toArray(".project-view").forEach((sec, i) => {
   const pin = shapePins.find((p) => p.trigger === sec);
   gsap.fromTo(sec.querySelector(".project"),
-    { y: 180, rotation: i % 2 ? 7 : -7, scale: 0.8, opacity: 0 },
+    { y: 90, rotation: i % 2 ? 1.5 : -1.5, scale: 0.95, opacity: 0 },
     {
       y: 0,
       rotation: 0,
@@ -330,29 +326,15 @@ gsap.utils.toArray(".project-view").forEach((sec, i) => {
     });
 });
 
-// index numbers spin in
+// index numbers fade up
 gsap.utils.toArray(".section-index, .project-num").forEach((el) => {
   gsap.from(el, {
-    rotation: 270,
-    scale: 0,
+    y: 12,
     opacity: 0,
-    duration: 0.9,
-    ease: "back.out(1.7)",
+    duration: 0.8,
+    ease: "power3.out",
     scrollTrigger: revealAt(el),
   });
-});
-
-// stat tiles flip up like departure-board cards
-gsap.from(".stat", {
-  yPercent: 80,
-  opacity: 0,
-  rotateX: -70,
-  transformPerspective: 700,
-  transformOrigin: "center top",
-  stagger: 0.12,
-  duration: 1,
-  ease: "power3.out",
-  scrollTrigger: { trigger: ".stats-grid", start: "top 82%", toggleActions: "play none none reverse" },
 });
 
 /* ---------- Animated stat counters ---------- */
@@ -368,23 +350,6 @@ gsap.utils.toArray(".stat-num").forEach((el) => {
     onUpdate: () => { el.textContent = obj.v.toFixed(decimals); },
   });
 });
-
-/* ---------- Marquee ---------- */
-if (!reducedMotion) {
-  const track = document.getElementById("marqueeTrack");
-  const marqueeTween = gsap.to(track, { xPercent: -50, ease: "none", duration: 22, repeat: -1 });
-  // scroll velocity whips the marquee faster; scrolling up runs it backwards
-  let ts = 1;
-  let tsTarget = 1;
-  lenis?.on("scroll", ({ velocity }) => {
-    tsTarget = gsap.utils.clamp(-6, 6, 1 + velocity * 0.09);
-  });
-  gsap.ticker.add(() => {
-    tsTarget += (1 - tsTarget) * 0.04;
-    ts += (tsTarget - ts) * 0.1;
-    marqueeTween.timeScale(ts);
-  });
-}
 
 /* ---------- Custom cursor ---------- */
 const dot = document.getElementById("cursorDot");
@@ -445,7 +410,7 @@ function hitPad(pad) {
   playBol(pad.dataset.bol);
   sceneApi.pulse(1);
   gsap.fromTo(pad,
-    { scale: 0.92, borderColor: "#ff4d2e" },
+    { scale: 0.92, borderColor: getComputedStyle(document.documentElement).getPropertyValue("--accent") },
     { scale: 1, borderColor: "rgba(242,240,234,0.12)", duration: 0.45, ease: "elastic.out(1, 0.45)" }
   );
 }
