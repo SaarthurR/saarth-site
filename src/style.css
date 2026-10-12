@@ -338,14 +338,10 @@ main { position: relative; z-index: 1; }
 /* ---------- Off screen ---------- */
 .off-list { list-style: none; max-width: 46rem; border-top: 1px solid var(--line); }
 .off-item {
-  display: grid;
-  grid-template-columns: 9rem 1fr;
-  gap: 1.5rem;
   padding: 1.1rem 0;
   border-bottom: 1px solid var(--line);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
 }
-.off-name { font-size: clamp(1.1rem, 2.2vw, 1.4rem); font-weight: 700; }
-.off-desc { color: var(--ink-dim); font-size: clamp(0.95rem, 1.8vw, 1.1rem); }
 
 /* ---------- Contact ---------- */
 .contact-note {
@@ -413,5 +409,4 @@ main { position: relative; z-index: 1; }
   .nav-cta { padding: 0.35rem 0.75rem !important; }
   .about-body { grid-template-columns: 1fr; }
   .about-photo { max-width: 14rem; }
-  .off-item { grid-template-columns: 1fr; gap: 0.25rem; }
 }
