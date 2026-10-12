@@ -94,6 +94,12 @@ body {
   font-size: 0.6rem; color: var(--accent);
 }
 .cursor-ring.is-hit::after { content: "play"; }
+.cursor-ring.is-drag {
+  width: 72px; height: 72px;
+  background: var(--accent); border-color: var(--accent);
+  font-size: 0.65rem;
+}
+.cursor-ring.is-drag::after { content: "drag"; }
 @media (hover: none), (pointer: coarse) {
   .cursor-dot, .cursor-ring { display: none; }
 }
@@ -336,20 +342,35 @@ main { position: relative; z-index: 1; }
 }
 
 /* ---------- Off screen ---------- */
-.off-list { list-style: none; max-width: 46rem; border-top: 1px solid var(--line); }
-.off-item {
-  padding: 1.1rem 0;
-  border-bottom: 1px solid var(--line);
-  font-size: clamp(1.05rem, 2vw, 1.3rem);
+.off-text { max-width: 40rem; font-size: clamp(1.15rem, 2.4vw, 1.5rem); line-height: 1.5; }
+.cars { margin-top: 2.5rem; }
+/* native scroll-snap does the physics; JS only adds drag + the depth effect */
+.car-track {
+  display: flex; gap: 1.25rem; align-items: center;
+  overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+  padding: 1.5rem 0; scrollbar-width: none; cursor: grab;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
+.car-track::-webkit-scrollbar { display: none; }
+.car-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+.car {
+  height: clamp(16rem, 46vh, 28rem); width: auto; flex: none;
+  border-radius: 14px; scroll-snap-align: center; user-select: none;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  will-change: transform;
+}
+.car:first-child { margin-left: 30%; }
+.car:last-child { margin-right: 30%; }
+.car-bar { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
+.car-note { margin-right: auto; font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-dim); }
+.car-btn {
+  width: 2.75rem; height: 2.75rem; border-radius: 50%;
+  border: 1px solid var(--line); background: none; color: var(--ink);
+  font-size: 1rem; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+}
+.car-btn:hover, .car-btn:focus-visible { border-color: var(--accent); color: var(--accent); }
 
 /* ---------- Contact ---------- */
-.contact-note {
-  color: var(--ink-dim);
-  font-size: clamp(1rem, 2vw, 1.25rem);
-  max-width: 34rem;
-  margin-bottom: 2rem;
-}
 .contact { text-align: left; padding-bottom: 3rem; }
 .section.contact { margin-bottom: 0; }
 .contact-title {

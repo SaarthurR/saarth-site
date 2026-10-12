@@ -331,6 +331,62 @@ gsap.utils.toArray(".stat-num").forEach((el) => {
   });
 });
 
+/* ---------- Car carousel ---------- */
+// scroll-snap moves it; this adds mouse drag, the arrow buttons, and a depth
+// effect where the photo nearest the center sits big and sharp
+const track = document.getElementById("carTrack");
+const cars = [...track.children];
+function depth() {
+  const mid = track.getBoundingClientRect().left + track.clientWidth / 2;
+  cars.forEach((img) => {
+    const r = img.getBoundingClientRect();
+    const d = Math.min(1, Math.abs(r.left + r.width / 2 - mid) / track.clientWidth);
+    img.style.transform = reducedMotion ? "" :
+      `scale(${1 - d * 0.18}) rotateY(${(r.left + r.width / 2 < mid ? 1 : -1) * d * 18}deg)`;
+    img.style.opacity = 1 - d * 0.55;
+  });
+}
+track.style.perspective = "1200px";
+track.addEventListener("scroll", () => requestAnimationFrame(depth), { passive: true });
+window.addEventListener("resize", depth);
+cars.forEach((img) => img.complete || img.addEventListener("load", depth));
+depth();
+
+let drag = null;
+track.addEventListener("pointerdown", (e) => {
+  if (e.pointerType !== "mouse") return; // touch already swipes natively
+  drag = { x: e.clientX, left: track.scrollLeft };
+  track.classList.add("is-dragging");
+  track.setPointerCapture(e.pointerId);
+});
+track.addEventListener("pointermove", (e) => {
+  if (drag) track.scrollLeft = drag.left - (e.clientX - drag.x);
+});
+const endDrag = () => {
+  if (!drag) return;
+  drag = null;
+  // snap back on after the drag so it settles on the nearest photo
+  const left = track.scrollLeft;
+  track.classList.remove("is-dragging");
+  track.scrollLeft = left;
+  const mid = track.getBoundingClientRect().left + track.clientWidth / 2;
+  const near = cars.reduce((a, b) => {
+    const da = Math.abs(a.getBoundingClientRect().left + a.width / 2 - mid);
+    const db = Math.abs(b.getBoundingClientRect().left + b.width / 2 - mid);
+    return db < da ? b : a;
+  });
+  near.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+};
+track.addEventListener("pointerup", endDrag);
+track.addEventListener("pointercancel", endDrag);
+
+document.querySelectorAll(".car-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const w = cars[0].getBoundingClientRect().width + 20;
+    track.scrollBy({ left: Number(btn.dataset.dir) * w, behavior: "smooth" });
+  });
+});
+
 /* ---------- Custom cursor ---------- */
 const dot = document.getElementById("cursorDot");
 const ring = document.getElementById("cursorRing");
