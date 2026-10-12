@@ -277,6 +277,7 @@ export function buildShapes(count) {
   return [
     { data: orb, offset: [0, 0, 0], dim: 0.9, scale: 0.72, type: TYPE.BREATH, tint: WARM_WHITE }, // hero — smaller so it frames the title instead of swallowing it
     { data: orb, offset: [2.0, 0, -0.6], dim: 0.7, type: TYPE.BREATH, tint: WARM_WHITE },     // projects intro (orb glides right)
+    { data: orb, offset: [1.4, 0, -0.4], dim: 0.6, scale: 0.8, type: TYPE.BREATH, tint: [0.80, 0.78, 0.96] }, // atticus — its own orb, voice violet
     { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, tint: [0.96, 0.79, 0.66] },      // juber — route orange
     { data: arm(count), offset: [1.3, 0, -0.4], dim: 0.55, type: TYPE.SWAY, tint: [0.82, 0.86, 0.92] },           // robotics — steel
     { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, tint: [0.72, 0.88, 0.95] },  // physics — cool cyan
