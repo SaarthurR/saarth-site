@@ -1,9 +1,13 @@
+import { inject } from '@vercel/analytics';
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import Snap from "lenis/snap";
 import { createScene } from "./scene.js";
 import { createHelix } from "./helix.js";
+
+// Initialize Vercel Web Analytics
+inject();
 
 gsap.registerPlugin(ScrollTrigger);
 window.__ST = ScrollTrigger; // debug handle for the verify scripts
