@@ -183,23 +183,24 @@
         <h2 class="section-title"><span class="reveal-line">Off the</span> <span class="reveal-line">screen</span></h2>
       </div>
       <p class="off-text reveal-block">I've played tabla, an Indian classical instrument, for nearly a decade. I also love cars, so here are a few I've shot.</p>
-      <div class="cars reveal-block">
-        <div class="car-track" id="carTrack" data-cursor="drag">
-          <img class="car" src="/cars/car-1.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
-          <img class="car" src="/cars/car-2.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
-          <img class="car" src="/cars/car-3.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
-          <img class="car" src="/cars/car-4.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
-          <img class="car" src="/cars/car-5.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
-          <img class="car" src="/cars/car-6.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
-          <img class="car" src="/cars/car-7.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
-          <img class="car" src="/cars/car-8.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
-          <img class="car" src="/cars/car-9.jpg" alt="A car I shot at Monterey Car Week" loading="lazy" draggable="false">
+      <div class="cars">
+        <div class="fan" id="carFan">
+          <div class="fan-card" data-cursor="view"><img src="/cars/car-1.jpg" alt="A car I shot at Monterey Car Week" draggable="false"></div>
+          <div class="fan-card" data-cursor="view"><img src="/cars/car-2.jpg" alt="A car I shot at Monterey Car Week" draggable="false"></div>
+          <div class="fan-card" data-cursor="view"><img src="/cars/car-3.jpg" alt="A car I shot at Monterey Car Week" draggable="false"></div>
+          <div class="fan-card" data-cursor="view"><img src="/cars/car-4.jpg" alt="A car I shot at Monterey Car Week" draggable="false"></div>
+          <div class="fan-card" data-cursor="view"><img src="/cars/car-5.jpg" alt="A car I shot at Monterey Car Week" draggable="false"></div>
+          <div class="fan-card" data-cursor="view"><img src="/cars/car-6.jpg" alt="A car I shot at Monterey Car Week" draggable="false"></div>
+          <div class="fan-card" data-cursor="view"><img src="/cars/car-7.jpg" alt="A car I shot at Monterey Car Week" draggable="false"></div>
+          <div class="fan-card" data-cursor="view"><img src="/cars/car-8.jpg" alt="A car I shot at Monterey Car Week" draggable="false"></div>
         </div>
-        <div class="car-bar">
-          <span class="car-note">Monterey Car Week, 2025</span>
-          <button class="car-btn" data-dir="-1" aria-label="Previous photo" data-cursor="hover">←</button>
-          <button class="car-btn" data-dir="1" aria-label="Next photo" data-cursor="hover">→</button>
+        <div class="fan-bar">
+          <button class="fan-btn" data-dir="-1" aria-label="Previous photo" data-cursor="hover">←</button>
+          <div class="fan-dots" id="carDots"></div>
+          <button class="fan-btn" data-dir="1" aria-label="Next photo" data-cursor="hover">→</button>
         </div>
+        <dialog class="car-view" id="carView" aria-label="Full photo"><img alt=""></dialog>
+      </div>
       </div>
     </section>
 

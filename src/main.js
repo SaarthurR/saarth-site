@@ -332,60 +332,127 @@ gsap.utils.toArray(".stat-num").forEach((el) => {
 });
 
 /* ---------- Car carousel ---------- */
-// scroll-snap moves it; this adds mouse drag, the arrow buttons, and a depth
-// effect where the photo nearest the center sits big and sharp
-const track = document.getElementById("carTrack");
-const cars = [...track.children];
-function depth() {
-  const mid = track.getBoundingClientRect().left + track.clientWidth / 2;
-  cars.forEach((img) => {
-    const r = img.getBoundingClientRect();
-    const d = Math.min(1, Math.abs(r.left + r.width / 2 - mid) / track.clientWidth);
-    img.style.transform = reducedMotion ? "" :
-      `scale(${1 - d * 0.18}) rotateY(${(r.left + r.width / 2 < mid ? 1 : -1) * d * 18}deg)`;
-    img.style.opacity = 1 - d * 0.55;
+// vanilla port of 21st.dev's card-fan-carousel: 7 cards fanned like a hand,
+// arrows/swipe cycle through the rest, hovering a card spreads its neighbours
+const fan = document.getElementById("carFan");
+const fanCards = [...fan.children];
+const FAN = [
+  { rot: -21, scale: 0.7756, x: -30, y: 7.3, z: 1 },
+  { rot: -14, scale: 0.8498, x: -22, y: 4.0, z: 2 },
+  { rot: -7, scale: 0.9346, x: -11, y: 1.3, z: 3 },
+  { rot: 0, scale: 1, x: 0, y: 0, z: 10 },
+  { rot: 7, scale: 0.9346, x: 11, y: 1.3, z: 3 },
+  { rot: 14, scale: 0.8498, x: 22, y: 4.0, z: 2 },
+  { rot: 21, scale: 0.7756, x: 30, y: 7.3, z: 1 },
+];
+const fanCount = fanCards.length;
+let fanCenter = 3;
+let fanBusy = true; // until the entry animation finishes
+let fanShown = new Map();
+const widthMult = () => {
+  const w = window.innerWidth;
+  return w < 480 ? 0.28 : w < 640 ? 0.38 : w < 768 ? 0.5 : w < 1024 ? 0.75 : 1;
+};
+const dots = document.getElementById("carDots");
+dots.innerHTML = fanCards.map(() => "<span></span>").join("");
+
+function fanMap(center) { // card index -> slot 0..6
+  const m = new Map();
+  for (let slot = 0; slot < 7; slot++) m.set(((center + slot - 3) % fanCount + fanCount) % fanCount, slot);
+  return m;
+}
+function slotTarget(slot, hovered = null) {
+  const b = FAN[slot], m = widthMult();
+  let x = b.x * m, y = b.y, rot = b.rot, scale = b.scale;
+  if (hovered !== null) {
+    const dist = Math.abs(slot - hovered);
+    if (slot === hovered) { y -= 2.5; scale *= 1.08; }
+    else {
+      const push = 8 * (1 - Math.abs((slot - 3) / 3)) * (1 + 0.2 * Math.max(0, 3 - dist));
+      const side = slot < hovered ? -1 : 1;
+      x += side * push * m;
+      rot += side * 3 / (dist + 1);
+      if ((slot === 6 && hovered < 3) || (slot === 0 && hovered > 3)) y -= 1;
+    }
+  }
+  return { x: `${x}rem`, y: `${y}rem`, rotation: rot, scale, zIndex: b.z };
+}
+function layoutFan(dir = 0, first = false) {
+  const next = fanMap(fanCenter);
+  fanCards.forEach((card, i) => {
+    const slot = next.get(i);
+    if (slot !== undefined) {
+      const t = { ...slotTarget(slot), opacity: 1 };
+      if (first) {
+        gsap.fromTo(card, { x: 0, y: "12rem", rotation: 0, scale: 0.5, opacity: 0 },
+          { ...t, duration: 1.2, ease: "elastic.out(1.05,.78)", delay: 0.2 + slot * 0.06 });
+      } else if (!fanShown.has(i)) {
+        gsap.fromTo(card, { x: `${dir * 40}rem`, y: t.y, rotation: dir * 30, scale: 0.5, opacity: 0 },
+          { ...t, duration: 0.6, ease: "power2.out" });
+      } else gsap.to(card, { ...t, duration: 0.5, ease: "power2.out" });
+    } else if (fanShown.has(i)) {
+      gsap.to(card, { x: `${-dir * 40}rem`, rotation: -dir * 30, scale: 0.5, opacity: 0, zIndex: 0, duration: 0.4, ease: "power2.in" });
+    }
+  });
+  fanShown = next;
+  [...dots.children].forEach((d, i) => d.classList.toggle("is-on", i === fanCenter));
+}
+function cycleFan(dir) {
+  if (fanBusy) return;
+  fanBusy = true;
+  fanCenter = (fanCenter + dir + fanCount) % fanCount;
+  layoutFan(dir);
+  gsap.delayedCall(0.6, () => { fanBusy = false; });
+}
+function hoverFan(hovered) {
+  fanShown.forEach((slot, i) => gsap.to(fanCards[i], {
+    ...slotTarget(slot, hovered), duration: 0.5, ease: "elastic.out(1,.75)", overwrite: "auto",
+    delay: Math.abs(slot - (hovered ?? 3)) * 0.02,
+  }));
+}
+
+if (reducedMotion) {
+  fanBusy = false;
+  fanShown = fanMap(fanCenter);
+  fanShown.forEach((slot, i) => gsap.set(fanCards[i], { ...slotTarget(slot), opacity: 1 }));
+  [...dots.children][fanCenter].classList.add("is-on");
+} else {
+  ScrollTrigger.create({
+    trigger: fan, start: "top 80%", once: true,
+    onEnter: () => {
+      layoutFan(0, true);
+      gsap.delayedCall(1.8, () => { fanBusy = false; });
+    },
   });
 }
-track.style.perspective = "1200px";
-track.addEventListener("scroll", () => requestAnimationFrame(depth), { passive: true });
-window.addEventListener("resize", depth);
-cars.forEach((img) => img.complete || img.addEventListener("load", depth));
-depth();
+fanCards.forEach((card, i) => card.addEventListener("mouseenter", () => {
+  if (!fanBusy && fanShown.has(i)) hoverFan(fanShown.get(i));
+}));
+fan.addEventListener("mouseleave", () => { if (!fanBusy) hoverFan(null); });
+document.querySelectorAll(".fan-btn").forEach((btn) =>
+  btn.addEventListener("click", () => cycleFan(Number(btn.dataset.dir))));
+let swipeX = null;
+let swiped = false;
+fan.addEventListener("pointerdown", (e) => { swipeX = e.clientX; swiped = false; });
+fan.addEventListener("pointerup", (e) => {
+  if (swipeX !== null && Math.abs(e.clientX - swipeX) > 40) {
+    swiped = true;
+    cycleFan(e.clientX < swipeX ? 1 : -1);
+  }
+  swipeX = null;
+});
 
-let drag = null;
-track.addEventListener("pointerdown", (e) => {
-  if (e.pointerType !== "mouse") return; // touch already swipes natively
-  drag = { x: e.clientX, left: track.scrollLeft };
-  track.classList.add("is-dragging");
-  track.setPointerCapture(e.pointerId);
-});
-track.addEventListener("pointermove", (e) => {
-  if (drag) track.scrollLeft = drag.left - (e.clientX - drag.x);
-});
-const endDrag = () => {
-  if (!drag) return;
-  drag = null;
-  // snap back on after the drag so it settles on the nearest photo
-  const left = track.scrollLeft;
-  track.classList.remove("is-dragging");
-  track.scrollLeft = left;
-  const mid = track.getBoundingClientRect().left + track.clientWidth / 2;
-  const near = cars.reduce((a, b) => {
-    const da = Math.abs(a.getBoundingClientRect().left + a.width / 2 - mid);
-    const db = Math.abs(b.getBoundingClientRect().left + b.width / 2 - mid);
-    return db < da ? b : a;
-  });
-  near.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-};
-track.addEventListener("pointerup", endDrag);
-track.addEventListener("pointercancel", endDrag);
-
-document.querySelectorAll(".car-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const w = cars[0].getBoundingClientRect().width + 20;
-    track.scrollBy({ left: Number(btn.dataset.dir) * w, behavior: "smooth" });
-  });
-});
+// click a card to see the whole photo, uncropped; click anywhere or Esc closes
+const carView = document.getElementById("carView");
+fanCards.forEach((card) => card.addEventListener("click", () => {
+  if (swiped) return;
+  carView.querySelector("img").src = card.querySelector("img").src;
+  carView.showModal();
+  lenis?.stop();
+}));
+carView.addEventListener("click", () => carView.close());
+carView.addEventListener("close", () => lenis?.start());
+window.addEventListener("resize", () => { if (!fanBusy) hoverFan(null); });
 
 /* ---------- Custom cursor ---------- */
 const dot = document.getElementById("cursorDot");

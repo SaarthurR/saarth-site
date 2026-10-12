@@ -94,12 +94,6 @@ body {
   font-size: 0.6rem; color: var(--accent);
 }
 .cursor-ring.is-hit::after { content: "play"; }
-.cursor-ring.is-drag {
-  width: 72px; height: 72px;
-  background: var(--accent); border-color: var(--accent);
-  font-size: 0.65rem;
-}
-.cursor-ring.is-drag::after { content: "drag"; }
 @media (hover: none), (pointer: coarse) {
   .cursor-dot, .cursor-ring { display: none; }
 }
@@ -344,31 +338,39 @@ main { position: relative; z-index: 1; }
 /* ---------- Off screen ---------- */
 .off-text { max-width: 40rem; font-size: clamp(1.15rem, 2.4vw, 1.5rem); line-height: 1.5; }
 .cars { margin-top: 2.5rem; }
-/* native scroll-snap does the physics; JS only adds drag + the depth effect */
-.car-track {
-  display: flex; gap: 1.25rem; align-items: center;
-  overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
-  padding: 1.5rem 0; scrollbar-width: none; cursor: grab;
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+/* card-fan carousel (ported from 21st.dev card-fan-carousel): cards stack at
+   center and GSAP fans them out, so the box only sets size */
+.fan {
+  position: relative; height: clamp(22rem, 62vh, 36rem);
+  display: flex; align-items: center; justify-content: center;
+  touch-action: pan-y; user-select: none;
 }
-.car-track::-webkit-scrollbar { display: none; }
-.car-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
-.car {
-  height: clamp(16rem, 46vh, 28rem); width: auto; flex: none;
-  border-radius: 14px; scroll-snap-align: center; user-select: none;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  will-change: transform;
+.fan-card {
+  position: absolute; width: clamp(9rem, 22vw, 17rem); aspect-ratio: 2 / 3;
+  border-radius: 16px; overflow: hidden; opacity: 0;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  outline: 1px solid var(--line);
 }
-.car:first-child { margin-left: 30%; }
-.car:last-child { margin-right: 30%; }
-.car-bar { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
-.car-note { margin-right: auto; font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-dim); }
-.car-btn {
+.fan-card img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.fan-card { cursor: zoom-in; }
+.car-view {
+  margin: auto; padding: 0; border: 0; outline: none; background: none; max-width: none; max-height: none;
+}
+.car-view::backdrop { background: rgba(6, 6, 8, 0.88); backdrop-filter: blur(8px); }
+.car-view img {
+  display: block; max-width: 92vw; max-height: 88vh; border-radius: 14px;
+  cursor: zoom-out;
+}
+.fan-bar { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1rem; }
+.fan-dots { display: flex; gap: 0.5rem; }
+.fan-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--line); transition: background 0.3s, transform 0.3s; }
+.fan-dots span.is-on { background: var(--accent); transform: scale(1.4); }
+.fan-btn {
   width: 2.75rem; height: 2.75rem; border-radius: 50%;
-  border: 1px solid var(--line); background: none; color: var(--ink);
-  font-size: 1rem; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+  border: 1px solid var(--line); background: rgba(255, 255, 255, 0.04); color: var(--ink);
+  backdrop-filter: blur(16px); font-size: 1rem; cursor: pointer; transition: border-color 0.2s, color 0.2s;
 }
-.car-btn:hover, .car-btn:focus-visible { border-color: var(--accent); color: var(--accent); }
+.fan-btn:hover, .fan-btn:focus-visible { border-color: var(--accent); color: var(--accent); }
 
 /* ---------- Contact ---------- */
 .contact { text-align: left; padding-bottom: 3rem; }
