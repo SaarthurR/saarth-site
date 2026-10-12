@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import Snap from "lenis/snap";
 import { createScene } from "./scene.js";
+import { createHelix } from "./helix.js";
 
 gsap.registerPlugin(ScrollTrigger);
 window.__ST = ScrollTrigger; // debug handle for the verify scripts
@@ -63,7 +64,8 @@ gsap.utils.toArray("[data-shape], .about").forEach((section) => {
   shapePins.push(ScrollTrigger.create({
     trigger: section,
     start: "center center",
-    end: "+=60%",
+    // the car section holds longer: scrolling through it turns the photo helix
+    end: section.id === "offscreen" ? "+=260%" : "+=60%",
     pin: true,
   }));
 });
@@ -71,7 +73,8 @@ gsap.utils.toArray("[data-shape], .about").forEach((section) => {
 // Where a section rests fully formed: the middle of the hold zone (pin window
 // minus the fly-out stretch). Contact and about never fly out.
 const restPoint = (pin) =>
-  pin === shapePins[shapePins.length - 1] || pin === aboutPin
+  pin.trigger.id === "offscreen" ? pin.start + 2 // land on the first photo, not mid-helix
+  : pin === shapePins[shapePins.length - 1] || pin === aboutPin
     ? (pin.start + pin.end) / 2
     : pin.start + (pin.end - pin.start - window.innerHeight * EXIT) / 2;
 
@@ -90,7 +93,8 @@ if (lenis) {
   let removeSnaps = [];
   const rebuildSnaps = () => {
     removeSnaps.forEach((remove) => remove());
-    removeSnaps = shapePins.map((p) => snap.add(restPoint(p)));
+    // no snap on the car section: it would yank the helix while you scroll it
+    removeSnaps = shapePins.filter((p) => p.trigger.id !== "offscreen").map((p) => snap.add(restPoint(p)));
   };
   rebuildSnaps();
   ScrollTrigger.addEventListener("refresh", rebuildSnaps); // pin positions move on resize
@@ -332,127 +336,41 @@ gsap.utils.toArray(".stat-num").forEach((el) => {
 });
 
 /* ---------- Car carousel ---------- */
-// vanilla port of 21st.dev's card-fan-carousel: 7 cards fanned like a hand,
-// arrows/swipe cycle through the rest, hovering a card spreads its neighbours
-const fan = document.getElementById("carFan");
-const fanCards = [...fan.children];
-const FAN = [
-  { rot: -21, scale: 0.7756, x: -30, y: 7.3, z: 1 },
-  { rot: -14, scale: 0.8498, x: -22, y: 4.0, z: 2 },
-  { rot: -7, scale: 0.9346, x: -11, y: 1.3, z: 3 },
-  { rot: 0, scale: 1, x: 0, y: 0, z: 10 },
-  { rot: 7, scale: 0.9346, x: 11, y: 1.3, z: 3 },
-  { rot: 14, scale: 0.8498, x: 22, y: 4.0, z: 2 },
-  { rot: 21, scale: 0.7756, x: 30, y: 7.3, z: 1 },
-];
-const fanCount = fanCards.length;
-let fanCenter = 3;
-let fanBusy = true; // until the entry animation finishes
-let fanShown = new Map();
-const widthMult = () => {
-  const w = window.innerWidth;
-  return w < 480 ? 0.28 : w < 640 ? 0.38 : w < 768 ? 0.5 : w < 1024 ? 0.75 : 1;
-};
-const dots = document.getElementById("carDots");
-dots.innerHTML = fanCards.map(() => "<span></span>").join("");
-
-function fanMap(center) { // card index -> slot 0..6
-  const m = new Map();
-  for (let slot = 0; slot < 7; slot++) m.set(((center + slot - 3) % fanCount + fanCount) % fanCount, slot);
-  return m;
-}
-function slotTarget(slot, hovered = null) {
-  const b = FAN[slot], m = widthMult();
-  let x = b.x * m, y = b.y, rot = b.rot, scale = b.scale;
-  if (hovered !== null) {
-    const dist = Math.abs(slot - hovered);
-    if (slot === hovered) { y -= 2.5; scale *= 1.08; }
-    else {
-      const push = 8 * (1 - Math.abs((slot - 3) / 3)) * (1 + 0.2 * Math.max(0, 3 - dist));
-      const side = slot < hovered ? -1 : 1;
-      x += side * push * m;
-      rot += side * 3 / (dist + 1);
-      if ((slot === 6 && hovered < 3) || (slot === 0 && hovered > 3)) y -= 1;
-    }
-  }
-  return { x: `${x}rem`, y: `${y}rem`, rotation: rot, scale, zIndex: b.z };
-}
-function layoutFan(dir = 0, first = false) {
-  const next = fanMap(fanCenter);
-  fanCards.forEach((card, i) => {
-    const slot = next.get(i);
-    if (slot !== undefined) {
-      const t = { ...slotTarget(slot), opacity: 1 };
-      if (first) {
-        gsap.fromTo(card, { x: 0, y: "12rem", rotation: 0, scale: 0.5, opacity: 0 },
-          { ...t, duration: 1.2, ease: "elastic.out(1.05,.78)", delay: 0.2 + slot * 0.06 });
-      } else if (!fanShown.has(i)) {
-        gsap.fromTo(card, { x: `${dir * 40}rem`, y: t.y, rotation: dir * 30, scale: 0.5, opacity: 0 },
-          { ...t, duration: 0.6, ease: "power2.out" });
-      } else gsap.to(card, { ...t, duration: 0.5, ease: "power2.out" });
-    } else if (fanShown.has(i)) {
-      gsap.to(card, { x: `${-dir * 40}rem`, rotation: -dir * 30, scale: 0.5, opacity: 0, zIndex: 0, duration: 0.4, ease: "power2.in" });
-    }
-  });
-  fanShown = next;
-  [...dots.children].forEach((d, i) => d.classList.toggle("is-on", i === fanCenter));
-}
-function cycleFan(dir) {
-  if (fanBusy) return;
-  fanBusy = true;
-  fanCenter = (fanCenter + dir + fanCount) % fanCount;
-  layoutFan(dir);
-  gsap.delayedCall(0.6, () => { fanBusy = false; });
-}
-function hoverFan(hovered) {
-  fanShown.forEach((slot, i) => gsap.to(fanCards[i], {
-    ...slotTarget(slot, hovered), duration: 0.5, ease: "elastic.out(1,.75)", overwrite: "auto",
-    delay: Math.abs(slot - (hovered ?? 3)) * 0.02,
-  }));
-}
-
-if (reducedMotion) {
-  fanBusy = false;
-  fanShown = fanMap(fanCenter);
-  fanShown.forEach((slot, i) => gsap.set(fanCards[i], { ...slotTarget(slot), opacity: 1 }));
-  [...dots.children][fanCenter].classList.add("is-on");
-} else {
+// WebGL helix (src/helix.js); click the front photo to see it whole, uncropped
+const carPhotos = Array.from({ length: 8 }, (_, i) => `/cars/car-${i + 1}.jpg`);
+const carView = document.getElementById("carView");
+const carCount = document.getElementById("carCount");
+const helix = createHelix(document.getElementById("carHelix"), carPhotos, {
+  // tighter than the original 0.8 / 0.79: cards keep their photo's narrower
+  // shape here, so the default spacing leaves big gaps
+  twist: 0.42,
+  rise: 0.6,
+  reduced: reducedMotion,
+  onActive: (i) => { carCount.textContent = `${String(i + 1).padStart(2, "0")} / ${String(carPhotos.length).padStart(2, "0")}`; },
+  onOpen: (i) => {
+    carView.querySelector("img").src = carPhotos[i];
+    carView.showModal();
+    lenis?.stop();
+  },
+});
+// shortcut: without WebGL2 the helix just hides; add a plain photo strip if that ever matters
+if (!helix) document.querySelector(".helix").hidden = true;
+// page scroll turns the helix while its section is pinned: the hold zone
+// (pin minus the fly-out stretch) walks through every photo once
+const carPin = shapePins.find((p) => p.trigger.id === "offscreen");
+if (helix && carPin) {
+  let last = 0;
   ScrollTrigger.create({
-    trigger: fan, start: "top 80%", once: true,
-    onEnter: () => {
-      layoutFan(0, true);
-      gsap.delayedCall(1.8, () => { fanBusy = false; });
+    start: () => carPin.start,
+    end: () => carPin.end - window.innerHeight * EXIT,
+    onUpdate: (self) => {
+      helix.turn((self.progress - last) * (carPhotos.length - 1));
+      last = self.progress;
     },
   });
 }
-fanCards.forEach((card, i) => card.addEventListener("mouseenter", () => {
-  if (!fanBusy && fanShown.has(i)) hoverFan(fanShown.get(i));
-}));
-fan.addEventListener("mouseleave", () => { if (!fanBusy) hoverFan(null); });
-document.querySelectorAll(".fan-btn").forEach((btn) =>
-  btn.addEventListener("click", () => cycleFan(Number(btn.dataset.dir))));
-let swipeX = null;
-let swiped = false;
-fan.addEventListener("pointerdown", (e) => { swipeX = e.clientX; swiped = false; });
-fan.addEventListener("pointerup", (e) => {
-  if (swipeX !== null && Math.abs(e.clientX - swipeX) > 40) {
-    swiped = true;
-    cycleFan(e.clientX < swipeX ? 1 : -1);
-  }
-  swipeX = null;
-});
-
-// click a card to see the whole photo, uncropped; click anywhere or Esc closes
-const carView = document.getElementById("carView");
-fanCards.forEach((card) => card.addEventListener("click", () => {
-  if (swiped) return;
-  carView.querySelector("img").src = card.querySelector("img").src;
-  carView.showModal();
-  lenis?.stop();
-}));
 carView.addEventListener("click", () => carView.close());
 carView.addEventListener("close", () => lenis?.start());
-window.addEventListener("resize", () => { if (!fanBusy) hoverFan(null); });
 
 /* ---------- Custom cursor ---------- */
 const dot = document.getElementById("cursorDot");

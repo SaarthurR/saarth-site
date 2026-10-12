@@ -94,6 +94,12 @@ body {
   font-size: 0.6rem; color: var(--accent);
 }
 .cursor-ring.is-hit::after { content: "play"; }
+.cursor-ring.is-drag {
+  width: 72px; height: 72px;
+  background: var(--accent); border-color: var(--accent);
+  font-size: 0.65rem;
+}
+.cursor-ring.is-drag::after { content: "drag"; }
 @media (hover: none), (pointer: coarse) {
   .cursor-dot, .cursor-ring { display: none; }
 }
@@ -337,22 +343,28 @@ main { position: relative; z-index: 1; }
 
 /* ---------- Off screen ---------- */
 .off-text { max-width: 40rem; font-size: clamp(1.15rem, 2.4vw, 1.5rem); line-height: 1.5; }
-.cars { margin-top: 2.5rem; }
-/* card-fan carousel (ported from 21st.dev card-fan-carousel): cards stack at
-   center and GSAP fans them out, so the box only sets size */
-.fan {
-  position: relative; height: clamp(22rem, 62vh, 36rem);
-  display: flex; align-items: center; justify-content: center;
-  touch-action: pan-y; user-select: none;
+/* car section is exactly one screen while pinned; the helix fills what the
+   heading and line leave */
+.section.offscreen {
+  height: 100vh; display: flex; flex-direction: column;
+  padding-top: clamp(5rem, 9vh, 7rem); padding-bottom: 1rem;
 }
-.fan-card {
-  position: absolute; width: clamp(9rem, 22vw, 17rem); aspect-ratio: 2 / 3;
-  border-radius: 16px; overflow: hidden; opacity: 0;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-  outline: 1px solid var(--line);
+.offscreen .section-head { margin-bottom: 1.25rem; }
+/* the helix fills whatever the heading and line leave, never behind them */
+.cars { flex: 1; min-height: 0; position: relative; margin-top: 1rem; }
+.helix { position: absolute; inset: 0; left: calc(50% - 50vw); width: 100vw; }
+/* the shader takes its grain colour from `color`, page colour from body */
+.helix-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  color: var(--ink);
+  cursor: grab; touch-action: pan-y; outline: none;
 }
-.fan-card img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-.fan-card { cursor: zoom-in; }
+.helix-canvas:active { cursor: grabbing; }
+.helix-count {
+  position: absolute; right: 6vw; bottom: 6%;
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-dim);
+  pointer-events: none;
+}
 .car-view {
   margin: auto; padding: 0; border: 0; outline: none; background: none; max-width: none; max-height: none;
 }
@@ -361,16 +373,6 @@ main { position: relative; z-index: 1; }
   display: block; max-width: 92vw; max-height: 88vh; border-radius: 14px;
   cursor: zoom-out;
 }
-.fan-bar { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1rem; }
-.fan-dots { display: flex; gap: 0.5rem; }
-.fan-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--line); transition: background 0.3s, transform 0.3s; }
-.fan-dots span.is-on { background: var(--accent); transform: scale(1.4); }
-.fan-btn {
-  width: 2.75rem; height: 2.75rem; border-radius: 50%;
-  border: 1px solid var(--line); background: rgba(255, 255, 255, 0.04); color: var(--ink);
-  backdrop-filter: blur(16px); font-size: 1rem; cursor: pointer; transition: border-color 0.2s, color 0.2s;
-}
-.fan-btn:hover, .fan-btn:focus-visible { border-color: var(--accent); color: var(--accent); }
 
 /* ---------- Contact ---------- */
 .contact { text-align: left; padding-bottom: 3rem; }
