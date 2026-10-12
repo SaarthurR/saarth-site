@@ -114,8 +114,10 @@ export function createScene(canvas, { reducedMotion }) {
         vec3 a = animate(aShapeA * uScaleA, uTypeA, aRandom) + uOffsetA;
         vec3 b = animate(aShapeB * uScaleB, uTypeB, aRandom) + uOffsetB;
 
-        // particles travel at slightly different speeds for a dissolve feel
-        float m = clamp(uMorph + (aRandom - 0.5) * 0.25, 0.0, 1.0);
+        // particles travel at slightly different speeds for a dissolve feel;
+        // stretched so every particle sits exactly at 0 / 1 when uMorph does,
+        // otherwise the late ones jump when the shape pair swaps over
+        float m = clamp(uMorph * 1.25 - aRandom * 0.25, 0.0, 1.0);
         m = m * m * (3.0 - 2.0 * m);
         vec3 pos = mix(a, b, m);
 

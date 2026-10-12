@@ -152,9 +152,13 @@ if (!reducedMotion) {
   // already driven by the swing-in tween, and two tweens on one element jitter
   shapePins.slice(1, -1).forEach((pin) => {
     const card = pin.trigger.querySelector(".project");
-    gsap.to(Array.from((card || pin.trigger).children), {
+    // fromTo with an explicit visible start: a plain .to() would record the
+    // reveal's hidden from-state as its start, and scrolling back up would
+    // scrub the content back to invisible
+    gsap.fromTo(Array.from((card || pin.trigger).children), { y: 0, opacity: 1 }, {
       y: -80,
       opacity: 0,
+      immediateRender: false,
       stagger: 0.08,
       ease: "power1.in",
       scrollTrigger: {
