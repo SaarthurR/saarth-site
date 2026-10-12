@@ -15,7 +15,7 @@ await page.waitForTimeout(3000);
 await page.screenshot({ path: "shots/v2-hero.png" });
 
 // wheel-scroll down section by section; pause long enough for snap to settle
-const ids = ["projects", "physics", "ascenta", "trading", "crm", "now", "tabla", "contact"];
+const ids = ["about", "atticus", "juber", "physics", "now", "offscreen", "contact"];
 for (const id of ids) {
   // scroll until this section is roughly centered
   for (let i = 0; i < 120; i++) {

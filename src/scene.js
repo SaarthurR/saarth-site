@@ -50,7 +50,6 @@ export function createScene(canvas, { reducedMotion }) {
     uOffsetB: { value: new THREE.Vector3() },
     uTintA: { value: new THREE.Color().setRGB(...slots[0].tint) },
     uTintB: { value: new THREE.Color().setRGB(...slots[1].tint) },
-    uAccent: { value: new THREE.Color().setRGB(...slots[0].accent) },
   };
 
   const material = new THREE.ShaderMaterial({
@@ -143,7 +142,6 @@ export function createScene(canvas, { reducedMotion }) {
       uniform float uMorph;
       uniform vec3 uTintA;
       uniform vec3 uTintB;
-      uniform vec3 uAccent;
       varying float vAlpha;
       varying float vHeat;
 
@@ -153,7 +151,7 @@ export function createScene(canvas, { reducedMotion }) {
         if (d > 0.5) discard;
         float glow = smoothstep(0.5, 0.0, d);
         vec3 base = mix(uTintA, uTintB, uMorph);
-        vec3 hot  = uAccent;
+        vec3 hot  = vec3(1.0, 0.302, 0.18);
         vec3 color = mix(base, hot, clamp(vHeat * 2.2, 0.0, 1.0));
         gl_FragColor = vec4(color, glow * vAlpha);
       }
@@ -208,7 +206,6 @@ export function createScene(canvas, { reducedMotion }) {
   window.addEventListener("resize", resize);
   resize();
 
-  const accentB = new THREE.Color();
   let targetF = 0;
   let currentF = 0;
   let pulseEnergy = 0;
@@ -233,8 +230,6 @@ export function createScene(canvas, { reducedMotion }) {
     const idx = Math.min(Math.floor(currentF), maxIdx);
     if (idx !== pairIdx) writePair(idx);
     uniforms.uMorph.value = Math.min(currentF - idx, 1);
-    const nextAccent = slots[Math.min(pairIdx + 1, slots.length - 1)].accent;
-    uniforms.uAccent.value.setRGB(...slots[pairIdx].accent).lerp(accentB.setRGB(...nextAccent), uniforms.uMorph.value);
 
     const oa = slots[pairIdx].offset;
     const ob = slots[Math.min(pairIdx + 1, slots.length - 1)].offset;
@@ -263,7 +258,6 @@ export function createScene(canvas, { reducedMotion }) {
   return {
     // f in [0, numShapes-1]; integer values = fully formed shape per section
     setProgress(f) { targetF = Math.max(0, Math.min(f, slots.length - 1)); },
-    accent() { return uniforms.uAccent.value.toArray(); },
     pulse(strength = 1) { pulseEnergy = Math.min(pulseEnergy + strength * 0.6, 1.4); },
   };
 }

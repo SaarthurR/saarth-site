@@ -3,7 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import Snap from "lenis/snap";
 import { createScene } from "./scene.js";
-import { playBol } from "./tabla.js";
+import * as Orbs from "./orbs.js";
 
 gsap.registerPlugin(ScrollTrigger);
 window.__ST = ScrollTrigger; // debug handle for the verify scripts
@@ -145,8 +145,11 @@ if (!reducedMotion) {
   // every other pinned section (except the last) flies its content upward
   // during the tail of its own pin — while it still owns the whole viewport,
   // never on top of the next section
+  // project cards fly out their inner parts, not the card itself: the card is
+  // already driven by the swing-in tween, and two tweens on one element jitter
   shapePins.slice(1, -1).forEach((pin) => {
-    gsap.to(Array.from(pin.trigger.children), {
+    const card = pin.trigger.querySelector(".project");
+    gsap.to(Array.from((card || pin.trigger).children), {
       y: -80,
       opacity: 0,
       stagger: 0.08,
@@ -156,24 +159,6 @@ if (!reducedMotion) {
         end: () => pin.end,
         scrub: true,
       },
-    });
-  });
-
-  // stack rows shear past each other in alternating directions
-  gsap.utils.toArray(".stack-row").forEach((row, i) => {
-    const dir = i % 2 ? 1 : -1;
-    gsap.fromTo(row,
-      { xPercent: 9 * dir, rotation: 2.5 * dir },
-      {
-        xPercent: -9 * dir,
-        rotation: -2.5 * dir,
-        ease: "none",
-        scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: true },
-      });
-    gsap.from(row, {
-      opacity: 0,
-      duration: 0.8,
-      scrollTrigger: { trigger: row, start: "top 92%", toggleActions: "play none none reverse" },
     });
   });
 
@@ -191,7 +176,6 @@ if (!reducedMotion) {
   });
 }
 
-let lastAccent = "";
 gsap.ticker.add(() => {
   const y = window.scrollY;
   const n = shapePins.length;
@@ -210,9 +194,6 @@ gsap.ticker.add(() => {
     }
   }
   sceneApi.setProgress(f);
-  // UI accent follows the particle color, so each section brings its own hue
-  const accent = `rgb(${sceneApi.accent().map((v) => Math.round(v * 255)).join(" ")})`;
-  if (accent !== lastAccent) document.documentElement.style.setProperty("--accent", (lastAccent = accent));
 });
 
 /* ---------- Preloader + hero intro ---------- */
@@ -402,44 +383,24 @@ if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
   ring.remove();
 }
 
-/* ---------- Playable tabla ---------- */
-const pads = document.querySelectorAll(".pad");
-const padByKey = { 1: "dha", 2: "tin", 3: "na", 4: "ge" };
-
-function hitPad(pad) {
-  playBol(pad.dataset.bol);
-  sceneApi.pulse(1);
-  gsap.fromTo(pad,
-    { scale: 0.92, borderColor: getComputedStyle(document.documentElement).getPropertyValue("--accent") },
-    { scale: 1, borderColor: "rgba(242,240,234,0.12)", duration: 0.45, ease: "elastic.out(1, 0.45)" }
-  );
+/* ---------- Atticus ring ---------- */
+// the same thinking-orbs "ring" Atticus shows on the Mac, 64px preset drawn 2.5x
+const orbCanvas = document.querySelector(".atticus-orb");
+if (orbCanvas) {
+  const S = 64, dpr = 2.5 * Math.min(window.devicePixelRatio, 2);
+  const ctx = orbCanvas.getContext("2d");
+  orbCanvas.width = orbCanvas.height = S * dpr;
+  const preset = Orbs.r("breathing", S);
+  let t = reducedMotion ? 1 : 0, prev = performance.now();
+  (function frame(now) {
+    if (!reducedMotion) t += Math.min(0.05, (now - prev) / 1000) * preset.speed;
+    prev = now;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, S, S);
+    Orbs.p(ctx, Orbs.M[preset.mode](S, t, preset.opts), true, { r: 255, g: 90, b: 54 });
+    if (!reducedMotion) requestAnimationFrame(frame);
+  })(prev);
 }
-
-pads.forEach((pad) => pad.addEventListener("pointerdown", () => hitPad(pad)));
-
-// one-time "come play" ripple across the pads when they scroll into view
-if (!reducedMotion && pads.length) {
-  ScrollTrigger.create({
-    ...revealAt(document.querySelector(".tabla-pads")),
-    once: true,
-    onEnter: () => {
-      gsap.fromTo(".pad",
-        { scale: 1 },
-        { scale: 1.08, duration: 0.28, yoyo: true, repeat: 1, stagger: 0.14, ease: "power2.inOut" }
-      );
-    },
-  });
-}
-
-window.addEventListener("keydown", (e) => {
-  if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (document.activeElement && /input|textarea/i.test(document.activeElement.tagName)) return;
-  const bol = padByKey[e.key];
-  if (bol) {
-    const pad = document.querySelector(`.pad[data-bol="${bol}"]`);
-    if (pad) hitPad(pad);
-  }
-});
 
 /* ---------- Anchor links work with Lenis + pinned sections ---------- */
 document.querySelectorAll('a[href^="#"]').forEach((a) => {

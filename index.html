@@ -33,7 +33,7 @@
       <a href="#about" data-cursor="hover">About</a>
       <a href="#projects" data-cursor="hover">Projects</a>
       <a href="#now" data-cursor="hover">Now</a>
-      <a href="#tabla" data-cursor="hover">Tabla</a>
+      <a href="#offscreen" data-cursor="hover">Off screen</a>
       <a href="#contact" class="nav-cta" data-cursor="hover">Contact</a>
     </div>
   </nav>
@@ -41,7 +41,7 @@
   <main id="top">
     <!-- HERO -->
     <section class="hero" id="hero" data-shape>
-      <p class="hero-eyebrow"><span class="line">Cupertino, CA</span></p>
+      <p class="hero-eyebrow"><span class="line">Cupertino, California</span></p>
       <h1 class="hero-title" aria-label="Hi, I'm Saarth">
         <span class="hero-row" aria-hidden="true">
           <span class="hero-word"><span class="hero-char">H</span><span class="hero-char">i</span><span class="hero-char">,</span></span>
@@ -52,8 +52,8 @@
         </span>
       </h1>
       <p class="hero-sub">
-        <span class="line">I'm 14. I build software people use.</span>
-        <span class="line">Right now that's Atticus and Juber.</span>
+        <span class="line">I'm 14, and I build software</span>
+        <span class="line">that people actually use.</span>
       </p>
       <div class="hero-scroll" aria-hidden="true">
         <span>scroll</span>
@@ -67,7 +67,10 @@
         <span class="section-index">01</span>
         <h2 class="section-title"><span class="reveal-line">The short</span> <span class="reveal-line">version</span></h2>
       </div>
-      <p class="about-text skew" id="aboutText">I'm a freshman in Cupertino. Most of what I build started as a problem right in front of me. My sister's physics class needed a study site, so I made one, and her classmates ended up using it too. Our Jain center needed carpools, so six of us are building Juber. Last summer I wrote software that drives a robot arm from a glove. Now it's mostly Atticus.</p>
+      <div class="about-body">
+        <img class="about-photo" src="/saarth.jpg" alt="Saarth smiling in Times Square" width="720" height="900" loading="lazy" />
+        <p class="about-text skew" id="aboutText">Most of what I build started as a problem right in front of me. My sister's physics class needed a study site, so I made one, and her classmates ended up using it too. Our Jain center needed carpools, so I started Juber and hired a team of six to build it with me. At DeepAware AI, I wrote software that drives a robot arm from a glove.</p>
+      </div>
     </section>
 
     <!-- PROJECTS INTRO -->
@@ -84,6 +87,7 @@
           <span class="project-num">P.01</span>
           <span class="project-tag">open source · macOS</span>
         </div>
+        <canvas class="atticus-orb" aria-hidden="true"></canvas>
         <h3 class="project-name">Atticus</h3>
         <p class="project-desc">A voice assistant for the Mac. Hold a key, talk, let go. Simple asks run instantly with no AI. The rest go to Claude on your own plan, for under a cent.</p>
         <span class="project-link">github.com/SaarthurR/atticus-mac ↗</span>
@@ -160,22 +164,6 @@
       </div>
     </section>
 
-    <!-- STACK -->
-    <section class="section stack" id="stack">
-      <div class="section-head">
-        <span class="section-index">03</span>
-        <h2 class="section-title"><span class="reveal-line">Built</span> <span class="reveal-line">with</span></h2>
-      </div>
-      <div class="stack-rows" aria-label="Tools I use">
-        <div class="stack-row skew"><span class="stack-cat">web</span>React · TypeScript</div>
-        <div class="stack-row skew"><span class="stack-cat">robotics</span>Python · Isaac Sim</div>
-        <div class="stack-row skew"><span class="stack-cat">backend</span>Node · Supabase</div>
-        <div class="stack-row skew"><span class="stack-cat">trading</span>Python · ib_insync</div>
-        <div class="stack-row skew"><span class="stack-cat">motion</span>Three.js · GSAP</div>
-        <div class="stack-row skew"><span class="stack-cat">deploy</span>Vite · Vercel</div>
-      </div>
-    </section>
-
     <!-- NOW -->
     <section class="section now" id="now" data-shape>
       <div class="section-head">
@@ -189,23 +177,19 @@
       </p>
     </section>
 
-    <!-- TABLA -->
-    <section class="section tabla" id="tabla" data-shape>
+    <!-- OFF SCREEN -->
+    <section class="section offscreen" id="offscreen" data-shape>
       <div class="section-head">
         <span class="section-index">05</span>
         <h2 class="section-title"><span class="reveal-line">Off the</span> <span class="reveal-line">screen</span></h2>
       </div>
-      <p class="tabla-text reveal-block skew">
-        I've played tabla for years. Performed, taught, the works.
-        It's the one thing I do that has nothing to do with a screen. <em>Except right now. Try it:</em>
-      </p>
-      <div class="tabla-pads" role="group" aria-label="Playable tabla — tap pads or press keys 1 to 4">
-        <button class="pad" data-bol="dha" data-cursor="hit"><span class="pad-bol">Dha</span><span class="pad-key">1</span></button>
-        <button class="pad" data-bol="tin" data-cursor="hit"><span class="pad-bol">Tin</span><span class="pad-key">2</span></button>
-        <button class="pad" data-bol="na"  data-cursor="hit"><span class="pad-bol">Na</span><span class="pad-key">3</span></button>
-        <button class="pad" data-bol="ge"  data-cursor="hit"><span class="pad-bol">Ge</span><span class="pad-key">4</span></button>
-      </div>
-      <p class="tabla-hint">tap the pads · or use keys 1–4</p>
+      <ul class="off-list">
+        <li class="off-item reveal-block"><span class="off-name">Tabla</span><span class="off-desc">I've played for years, and I've performed and taught it in my community.</span></li>
+        <li class="off-item reveal-block"><span class="off-name">Cars</span><span class="off-desc">Mostly through a camera. I shoot photos and video of them, and Pagani is my favorite.</span></li>
+        <li class="off-item reveal-block"><span class="off-name">Robotics</span><span class="off-desc">Three seasons of FIRST LEGO League with Team ShortCircuit, 2020 to 2023.</span></li>
+        <li class="off-item reveal-block"><span class="off-name">F1</span><span class="off-desc">And go-karting, the closest I get to driving one.</span></li>
+        <li class="off-item reveal-block"><span class="off-name">Rain</span><span class="off-desc">I like it more than sun. Same goes for anywhere green, like the Amazon.</span></li>
+      </ul>
     </section>
 
     <!-- CONTACT -->
@@ -215,6 +199,7 @@
         <span class="reveal-line">Let's build</span>
         <span class="reveal-line">something.</span>
       </h2>
+      <p class="contact-note reveal-block">I read every email. Building something, stuck on a project, or just want to talk cars or tabla? Write me.</p>
       <a class="contact-email" href="mailto:ranka.saarth@gmail.com" data-cursor="view">ranka.saarth@gmail.com</a>
       <p class="contact-sign reveal-block" aria-hidden="true">— Saarth Ranka</p>
       <footer class="footer">
