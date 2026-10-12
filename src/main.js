@@ -343,6 +343,35 @@ gsap.utils.toArray(".stat-num").forEach((el) => {
   });
 });
 
+/* ---------- Project timeline ---------- */
+// faint rail on the left: visible across the project pins, lights the one
+// on screen
+const timeline = document.getElementById("timeline");
+const tlTrack = document.getElementById("tlTrack");
+const tlItems = [...tlTrack.children];
+const tlPins = tlItems.map((a) => shapePins.find((p) => p.trigger.id === a.hash.slice(1)));
+ScrollTrigger.create({
+  start: () => tlPins[0].start - window.innerHeight * 0.3,
+  end: () => tlPins[tlPins.length - 1].end,
+  onToggle: (self) => timeline.classList.toggle("is-on", self.isActive),
+});
+// the date track scrolls with the page: rest point of project k = date k centred
+gsap.fromTo(tlTrack, { y: 0 }, {
+  y: () => -(tlItems.length - 1) * tlItems[0].offsetHeight,
+  ease: "none",
+  scrollTrigger: {
+    start: () => restPoint(tlPins[0]),
+    end: () => restPoint(tlPins[tlPins.length - 1]),
+    scrub: 0.6,
+    invalidateOnRefresh: true,
+  },
+});
+tlPins.forEach((pin, i) => ScrollTrigger.create({
+  start: () => pin.start - window.innerHeight * 0.3,
+  end: () => (tlPins[i + 1] ? tlPins[i + 1].start - window.innerHeight * 0.3 : pin.end),
+  onToggle: (self) => tlItems[i].classList.toggle("is-active", self.isActive),
+}));
+
 /* ---------- Car carousel ---------- */
 // WebGL helix (src/helix.js); click the front photo to see it whole, uncropped
 const carPhotos = Array.from({ length: 8 }, (_, i) => `/cars/car-${i + 1}.jpg`);
@@ -355,10 +384,14 @@ const helix = createHelix(document.getElementById("carHelix"), carPhotos, {
   rise: 0.6,
   reduced: reducedMotion,
   onActive: (i) => { carCount.textContent = `${String(i + 1).padStart(2, "0")} / ${String(carPhotos.length).padStart(2, "0")}`; },
-  onOpen: (i) => {
-    carView.querySelector("img").src = carPhotos[i];
+  onOpen: async (i, rect) => {
+    const img = carView.querySelector("img");
+    img.src = carPhotos[i];
+    await img.decode().catch(() => {});
     carView.showModal();
     lenis?.stop();
+    carRect = rect;
+    if (rect && !reducedMotion) gsap.fromTo(img, flipFrom(img, rect), flipHome);
   },
 });
 // shortcut: without WebGL2 the helix just hides; add a plain photo strip if that ever matters
@@ -377,7 +410,31 @@ if (helix && carPin) {
     },
   });
 }
-carView.addEventListener("click", () => carView.close());
+// FLIP: the full photo starts sitting exactly on its card, then grows to
+// its place; closing shrinks it back onto the card. Cards keep the photo's
+// aspect ratio, so this is a clean scale.
+let carRect = null;
+const flipHome = { x: 0, y: 0, scaleX: 1, scaleY: 1, duration: 0.7, ease: "expo.out" };
+function flipFrom(img, r) {
+  const f = img.getBoundingClientRect();
+  return {
+    x: r.left - f.left, y: r.top - f.top,
+    scaleX: r.width / f.width, scaleY: r.height / f.height, transformOrigin: "0 0",
+  };
+}
+carView.addEventListener("click", () => {
+  const img = carView.querySelector("img");
+  if (!carRect || reducedMotion) return carView.close();
+  carView.classList.add("is-closing");
+  gsap.to(img, {
+    ...flipFrom(img, carRect), duration: 0.5, ease: "expo.inOut",
+    onComplete: () => {
+      carView.close();
+      carView.classList.remove("is-closing");
+      gsap.set(img, { clearProps: "transform" });
+    },
+  });
+});
 carView.addEventListener("close", () => lenis?.start());
 
 /* ---------- Custom cursor ---------- */

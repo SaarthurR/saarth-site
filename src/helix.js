@@ -3,7 +3,7 @@
 // WebGL2 pipeline: cards -> colour + meta targets -> four vertical blurs -> composite.
 // Changes from the original: no React, no wheel capture (it would trap page
 // scroll), touch swipes sideways so the page still scrolls, the loop pauses
-// off-screen, clicking the front card calls onOpen, and every card keeps its
+// off-screen, clicking the front card calls onOpen(index, screenRect), and every card keeps its
 // photo's own aspect ratio instead of one cropped shape.
 
 const CARD_H = 1.6;
@@ -498,7 +498,14 @@ export function createHelix(canvas, images, {
     if (!wasClick) return;
     const hit = pick(pointerX, pointerY);
     if (hit < 0) return;
-    if (hit === active) return onOpen(hit); // front card: show it whole
+    if (hit === active) { // front card: show it whole, growing out of where it sits
+      const at = project(hit);
+      const box = canvas.getBoundingClientRect();
+      return onOpen(hit, at && {
+        left: box.left + at.x - at.halfW, top: box.top + at.y - at.halfH,
+        width: at.halfW * 2, height: at.halfH * 2,
+      });
+    }
     const want = (((hit - FRONT) % count) + count) % count;
     const to = want + Math.round((goal - want) / count) * count;
     tween = { from: goal, to, at: performance.now() };

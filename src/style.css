@@ -260,6 +260,40 @@ main { position: relative; z-index: 1; }
   margin-bottom: 0.75rem;
 }
 .project-num { color: var(--accent); }
+.project-date { color: var(--ink-dim); }
+
+/* ---------- Project timeline (left rail) ---------- */
+/* fixed, faint; the track slides with the scroll so the current project's
+   date always sits mid-window, neighbours fade out above and below */
+.timeline {
+  --tl-step: 2.75rem;
+  position: fixed; left: clamp(1rem, 2.5vw, 2.25rem); top: 50%; z-index: 20;
+  height: 34vh; transform: translateY(-50%); overflow: hidden;
+  mask-image: linear-gradient(transparent, #000 35%, #000 65%, transparent);
+  opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+}
+.timeline.is-on { opacity: 1; pointer-events: auto; }
+.tl-track { position: relative; padding-top: calc(17vh - var(--tl-step) / 2); will-change: transform; }
+.tl-track::before { /* the thread through the dots */
+  content: ""; position: absolute; left: 2.5px; top: 0; bottom: 0;
+  width: 1px; background: var(--line);
+}
+.tl-item {
+  height: var(--tl-step);
+  display: flex; align-items: center; gap: 0.7rem;
+  font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.04em;
+  color: var(--ink-dim); text-decoration: none; white-space: nowrap;
+  opacity: 0.35; transition: opacity 0.4s ease, color 0.4s ease;
+}
+.tl-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex: none; position: relative;
+  background: var(--bg); border: 1px solid var(--ink-dim);
+  transition: background 0.4s ease, border-color 0.4s ease;
+}
+.tl-item:hover { opacity: 0.7; }
+.tl-item.is-active { opacity: 1; color: var(--ink); }
+.tl-item.is-active .tl-dot { background: var(--accent); border-color: var(--accent); }
+@media (max-width: 760px) { .timeline { display: none; } }
 .project-tag {
   color: var(--ink-dim);
   border: 1px solid var(--line);
@@ -368,7 +402,12 @@ main { position: relative; z-index: 1; }
 .car-view {
   margin: auto; padding: 0; border: 0; outline: none; background: none; max-width: none; max-height: none;
 }
-.car-view::backdrop { background: rgba(6, 6, 8, 0.88); backdrop-filter: blur(8px); }
+.car-view::backdrop {
+  background: rgba(6, 6, 8, 0.88); backdrop-filter: blur(8px);
+  transition: opacity 0.5s ease;
+}
+@starting-style { .car-view[open]::backdrop { opacity: 0; } }
+.car-view.is-closing::backdrop { opacity: 0; }
 .car-view img {
   display: block; max-width: 92vw; max-height: 88vh; border-radius: 14px;
   cursor: zoom-out;
