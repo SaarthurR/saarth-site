@@ -94,6 +94,10 @@ export function createScene(canvas, { reducedMotion }) {
           float a = uTime * 0.25;
           float c = cos(a), s = sin(a);
           p.xz = mat2(c, -s, s, c) * p.xz;
+        } else if (type > 4.5) {
+          // Atticus ring: radius wobbles in 3- and 5-lobed waves that travel around it
+          float a = atan(p.y, p.x);
+          p.xy *= 1.0 + 0.09 * sin(a * 3.0 - uTime * 1.7) + 0.04 * sin(a * 5.0 + uTime * 1.1);
         } else {
           // tumble (knot)
           float a = uTime * 0.22;

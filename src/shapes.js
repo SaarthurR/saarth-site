@@ -1,6 +1,22 @@
 // Procedural particle shapes. All shapes are centered on their own origin;
 // world offset, dimming, and animation type are applied in the shader.
-export const TYPE = { SWAY: 0, BREATH: 1, WAVE: 2, SPIN: 3, TUMBLE: 4 };
+export const TYPE = { SWAY: 0, BREATH: 1, WAVE: 2, SPIN: 3, TUMBLE: 4, RING: 5 };
+
+// Atticus's ring (thinking-orbs "ring" mode): a thick band of short dashes,
+// face-on. The shader wobbles its radius the same way the app does.
+function atticusRing(count) {
+  const out = new Float32Array(count * 3);
+  const SEGS = 72, R = 1.15, BAND = 0.22;
+  for (let i = 0; i < count; i++) {
+    const seg = Math.floor(Math.random() * SEGS);
+    const a = ((seg + Math.random() * 0.55) / SEGS) * Math.PI * 2; // dash = 55% of each segment
+    const r = R + (Math.random() - 0.5) * BAND;
+    out[i * 3 + 0] = Math.cos(a) * r;
+    out[i * 3 + 1] = Math.sin(a) * r;
+    out[i * 3 + 2] = (Math.random() - 0.5) * 0.08;
+  }
+  return out;
+}
 
 function sphere(count) {
   const out = new Float32Array(count * 3);
@@ -279,7 +295,7 @@ export function buildShapes(count) {
   return [
     { data: orb, offset: [0, 0, 0], dim: 0.9, scale: 0.72, type: TYPE.BREATH, ...tone("#ff5a36", 0.2) }, // hero — smaller so it frames the title instead of swallowing it
     { data: orb, offset: [2.0, 0, -0.6], dim: 0.7, type: TYPE.BREATH, ...tone("#ff5a36") },     // projects intro (orb glides right)
-    { data: orb, offset: [1.4, 0, -0.4], dim: 0.6, scale: 0.8, type: TYPE.BREATH, ...tone("#8f7bff") }, // atticus — voice violet
+    { data: atticusRing(count), offset: [1.6, 0, -0.4], dim: 0.75, scale: 0.88, type: TYPE.RING, ...tone("#8f7bff") }, // atticus — its ring, voice violet
     { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, ...tone("#ffa040") },      // juber — route amber
     { data: arm(count), offset: [1.3, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#5ec8ff") },           // robotics — sky
     { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, ...tone("#2ee6c8") },  // physics — teal

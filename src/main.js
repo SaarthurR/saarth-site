@@ -3,7 +3,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import Snap from "lenis/snap";
 import { createScene } from "./scene.js";
-import * as Orbs from "./orbs.js";
 
 gsap.registerPlugin(ScrollTrigger);
 window.__ST = ScrollTrigger; // debug handle for the verify scripts
@@ -381,25 +380,6 @@ if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
 } else {
   dot.remove();
   ring.remove();
-}
-
-/* ---------- Atticus ring ---------- */
-// the same thinking-orbs "ring" Atticus shows on the Mac, 64px preset drawn 2.5x
-const orbCanvas = document.querySelector(".atticus-orb");
-if (orbCanvas) {
-  const S = 64, dpr = 2.5 * Math.min(window.devicePixelRatio, 2);
-  const ctx = orbCanvas.getContext("2d");
-  orbCanvas.width = orbCanvas.height = S * dpr;
-  const preset = Orbs.r("breathing", S);
-  let t = reducedMotion ? 1 : 0, prev = performance.now();
-  (function frame(now) {
-    if (!reducedMotion) t += Math.min(0.05, (now - prev) / 1000) * preset.speed;
-    prev = now;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, S, S);
-    Orbs.p(ctx, Orbs.M[preset.mode](S, t, preset.opts), true, { r: 255, g: 90, b: 54 });
-    if (!reducedMotion) requestAnimationFrame(frame);
-  })(prev);
 }
 
 /* ---------- Anchor links work with Lenis + pinned sections ---------- */

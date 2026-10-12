@@ -248,11 +248,6 @@ main { position: relative; z-index: 1; }
 }
 .project:hover::before, .project:focus-visible::before { opacity: 1; }
 .project:hover, .project:focus-visible { padding-left: 1.25rem; outline: none; }
-.atticus-orb {
-  position: absolute; right: 0; top: 50%;
-  width: 160px; height: 160px;
-  transform: translate(110%, -50%);
-}
 .project-meta {
   display: flex; gap: 1rem; align-items: center;
   font-family: var(--font-mono); font-size: 0.75rem;
@@ -419,5 +414,4 @@ main { position: relative; z-index: 1; }
   .about-body { grid-template-columns: 1fr; }
   .about-photo { max-width: 14rem; }
   .off-item { grid-template-columns: 1fr; gap: 0.25rem; }
-  .atticus-orb { position: static; transform: none; width: 96px; height: 96px; }
 }
