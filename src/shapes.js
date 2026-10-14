@@ -284,7 +284,7 @@ function knot(count) {
   return out;
 }
 
-// Order matches the [data-shape] sections in the DOM (projects newest first). Each slot gets a light
+// Order matches the [data-shape] sections in the DOM (projects oldest first). Each slot gets a light
 // wash of its own hue, so the color shifts a little per section while the
 // site's orange stays the one real accent.
 const tone = (hex, mix = 0.28) => ({
@@ -295,13 +295,13 @@ export function buildShapes(count) {
   return [
     { data: orb, offset: [0, 0, 0], dim: 0.9, scale: 0.72, type: TYPE.BREATH, ...tone("#ff5a36", 0.2) }, // hero — smaller so it frames the title instead of swallowing it
     { data: orb, offset: [2.0, 0, -0.6], dim: 0.7, type: TYPE.BREATH, ...tone("#ff5a36") },     // projects intro (orb glides right)
-    { data: atticusRing(count), offset: [1.6, 0, -0.4], dim: 0.75, scale: 0.88, type: TYPE.RING, ...tone("#8f7bff") }, // atticus — its ring, voice violet
-    { data: arm(count), offset: [1.3, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#5ec8ff") },           // robotics — sky
-    { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, ...tone("#2ee6c8") },  // physics — teal
-    { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, ...tone("#ffa040") },      // juber — route amber
-    { data: envelope(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#4f8bff") },     // crm — mail blue
-    { data: invader(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#c86bff") },      // ascenta — arcade purple
     { data: candles(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#3ddc84") },      // trading — ticker green
+    { data: invader(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#c86bff") },      // ascenta — arcade purple
+    { data: envelope(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#4f8bff") },     // crm — mail blue
+    { data: network(count), offset: [1.35, 0, -0.4], dim: 0.55, type: TYPE.SPIN, ...tone("#ffa040") },      // juber — route amber
+    { data: waveField(count), offset: [1.35, 0.1, -0.4], dim: 0.55, type: TYPE.WAVE, ...tone("#2ee6c8") },  // physics — teal
+    { data: arm(count), offset: [1.3, 0, -0.4], dim: 0.55, type: TYPE.SWAY, ...tone("#5ec8ff") },           // robotics — sky
+    { data: atticusRing(count), offset: [1.6, 0, -0.4], dim: 0.75, scale: 0.88, type: TYPE.RING, ...tone("#8f7bff") }, // atticus — its ring, voice violet
     { data: orb, offset: [1.5, 0, -0.5], dim: 0.6, type: TYPE.BREATH, ...tone("#ff5a36") },                 // now — orange
     { data: tabla(count), offset: [1.3, 0.1, -0.4], dim: 0, type: TYPE.SWAY, ...tone("#ff8a5c") },          // off screen — dim 0: particles fade out so the car helix has the stage
     { data: knot(count), offset: [0, 0, 0], dim: 1.0, type: TYPE.TUMBLE, ...tone("#ff5a36", 0.2) },  // contact
