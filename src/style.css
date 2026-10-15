@@ -321,6 +321,7 @@ main { position: relative; z-index: 1; }
   color: var(--accent);
 }
 .stat-num { font-variant-numeric: tabular-nums; }
+.star-chip { margin-left: 1rem; padding: 0.15rem 0.6rem; border: 1px solid currentColor; border-radius: 999px; font-variant-numeric: tabular-nums; }
 
 /* ---------- About ---------- */
 .about-text {

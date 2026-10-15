@@ -6,6 +6,12 @@ import Snap from "lenis/snap";
 import { createScene } from "./scene.js";
 import { createHelix } from "./helix.js";
 
+// Live star count; the card already links to the repo, where the Star button is.
+fetch("https://api.github.com/repos/SaarthurR/atticus-mac")
+  .then((r) => r.json())
+  .then((d) => { if (d.stargazers_count != null) document.getElementById("atticusStars").textContent = " · " + d.stargazers_count; })
+  .catch(() => {});
+
 // Initialize Vercel Web Analytics
 inject();
 
