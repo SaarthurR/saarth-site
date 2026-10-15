@@ -21,6 +21,9 @@
 
   <!-- Three.js canvas -->
   <canvas id="webgl" aria-hidden="true"></canvas>
+  <button class="motion-toggle" id="motionToggle" role="switch" aria-checked="false" data-cursor="hover">
+    <span class="motion-toggle-track" aria-hidden="true"></span>Reduce motion
+  </button>
 
   <!-- Custom cursor -->
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
@@ -34,6 +37,7 @@
       <a href="#projects" data-cursor="hover">Projects</a>
       <a href="#now" data-cursor="hover">Now</a>
       <a href="#offscreen" data-cursor="hover">Off screen</a>
+      <a href="/Saarth-Ranka-Resume.pdf" target="_blank" rel="noopener" data-cursor="hover">Resume</a>
       <a href="#contact" class="nav-cta" data-cursor="hover">Contact</a>
     </div>
   </nav>
@@ -65,7 +69,7 @@
     <section class="section about" id="about">
       <div class="section-head">
         <span class="section-index">01</span>
-        <h2 class="section-title"><span class="reveal-line">The short</span> <span class="reveal-line">version</span></h2>
+        <h2 class="section-title"><span class="reveal-line">About me</span></h2>
       </div>
       <div class="about-body">
         <img class="about-photo" src="/saarth.jpg" alt="Saarth smiling in Times Square" width="720" height="900" loading="lazy" />
@@ -101,7 +105,7 @@
           <span class="project-tag">finance</span>
         </div>
         <h3 class="project-name">Algorithmic Trading System</h3>
-        <p class="project-desc">Mean-reversion, run through ib_insync and TradingView webhooks. I also passed a funded futures evaluation in June and trade that account by hand.</p>
+        <p class="project-desc">A program that trades currencies on its own. When a price moves too far from normal, it bets the price will come back and places the trade.</p>
       </div>
     </section>
 
@@ -113,7 +117,7 @@
           <span class="project-tag">platform</span>
         </div>
         <h3 class="project-name">Ascenta</h3>
-        <p class="project-desc">Unblocked games and chat, built for school. Live, used daily.</p>
+        <p class="project-desc">A website where students can play games and chat with each other at school.</p>
         <span class="project-link">ascenta3.vercel.app ↗</span>
       </a>
     </section>
@@ -126,7 +130,7 @@
           <span class="project-tag">internal tool</span>
         </div>
         <h3 class="project-name">Internship Outreach CRM</h3>
-        <p class="project-desc">I was emailing ~<span class="stat-num" data-count="400">0</span> companies about internships and the spreadsheet gave up. So I built a real CRM. React, TypeScript, Node, Gmail API.</p>
+        <p class="project-desc">A tool for emailing companies about internships. It finds contact emails, sends the emails through Gmail, and tracks who replied.</p>
       </div>
     </section>
 
@@ -138,7 +142,7 @@
           <span class="project-tag">leading it</span>
         </div>
         <h3 class="project-name">Juber</h3>
-        <p class="project-desc">A ride-share app for a 5,000 person community center. I lead it, and I hired the six people who build it with me.</p>
+        <p class="project-desc">A ride-share app for the Jain Center of Northern California. Members use it to carpool to the center on busy days.</p>
         <span class="project-link">juber.s.gy/juber ↗</span>
       </a>
     </section>
@@ -151,7 +155,7 @@
           <span class="project-tag">education</span>
         </div>
         <h3 class="project-name">Physics 7C Study Site</h3>
-        <p class="project-desc">Built for my sister's college physics class. Her classmates started using it too. Waves, interference, Doppler, all of it.</p>
+        <p class="project-desc">A study site for a college physics class. It explains waves, interference and the Doppler effect.</p>
         <span class="project-link">physics7c.vercel.app ↗</span>
       </a>
     </section>
@@ -164,7 +168,7 @@
           <span class="project-tag">DeepAware AI · YC</span>
         </div>
         <h3 class="project-name">Robot Teleoperation</h3>
-        <p class="project-desc">Built it end to end: Isaac Sim on a DGX Spark driving a robot arm from a tactile glove and a Meta Quest, down to closing the gripper on a real hand.</p>
+        <p class="project-desc">Software that lets a person control a robot arm from far away, using a Meta Quest headset or a glove.</p>
         <span class="project-stat">shipped the arm control repo to real clients</span>
       </div>
     </section>
@@ -177,7 +181,7 @@
           <span class="project-tag">open source · macOS</span>
         </div>
         <h3 class="project-name">Atticus</h3>
-        <p class="project-desc">A voice assistant for the Mac. Hold a key, talk, let go. Simple asks run instantly with no AI. The rest go to Claude on your own plan, for under a cent.</p>
+        <p class="project-desc">A voice assistant for the Mac. Hold a key and say what you want, like opening an app or moving a window, and it does it.</p>
         <span class="project-link">github.com/SaarthurR/atticus-mac ↗</span>
       </a>
     </section>

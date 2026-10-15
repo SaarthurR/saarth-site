@@ -457,6 +457,32 @@ main { position: relative; z-index: 1; }
 }
 
 /* ---------- Reduced motion ---------- */
+.motion-toggle {
+  position: fixed; left: 1rem; bottom: 1rem; z-index: 50;
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.45rem 0.8rem; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em;
+  cursor: pointer; opacity: 0.75;
+}
+.motion-toggle:hover, .motion-toggle:focus-visible { opacity: 1; }
+.motion-toggle-track {
+  width: 1.6rem; height: 0.9rem; border-radius: 999px; background: var(--line); position: relative;
+}
+.motion-toggle-track::after {
+  content: ""; position: absolute; top: 0.1rem; left: 0.1rem;
+  width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--ink);
+}
+.motion-toggle[aria-checked="true"] .motion-toggle-track { background: var(--accent); }
+.motion-toggle[aria-checked="true"] .motion-toggle-track::after { left: 0.8rem; }
+/* calm mode: no particle orb behind the text, just the content */
+.calm #webgl { display: none; }
+.calm *, .calm *::before, .calm *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -468,7 +494,7 @@ main { position: relative; z-index: 1; }
 
 @media (max-width: 640px) {
   /* keep every nav destination reachable on phones — just tighten it */
-  .nav-links { gap: 0.9rem; }
+  .nav-links { gap: 0.6rem; }
   .nav-links a { font-size: 0.72rem; letter-spacing: 0.02em; }
   .nav-cta { padding: 0.35rem 0.75rem !important; }
   .about-body { grid-template-columns: 1fr; }

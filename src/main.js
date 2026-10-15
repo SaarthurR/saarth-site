@@ -12,7 +12,17 @@ inject();
 gsap.registerPlugin(ScrollTrigger);
 window.__ST = ScrollTrigger; // debug handle for the verify scripts
 
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+// "Reduce motion" toggle: reuses the prefers-reduced-motion path and remembers the choice
+let calm = false;
+try { calm = localStorage.getItem("calm") === "1"; } catch {}
+document.documentElement.classList.toggle("calm", calm);
+const motionToggle = document.getElementById("motionToggle");
+motionToggle.setAttribute("aria-checked", String(calm));
+motionToggle.addEventListener("click", () => {
+  try { localStorage.setItem("calm", calm ? "0" : "1"); } catch {}
+  location.reload(); // Lenis, pins and the orb are all set up once at load
+});
+const reducedMotion = calm || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ---------- Three.js background ---------- */
 const sceneApi = createScene(document.getElementById("webgl"), { reducedMotion });
@@ -70,7 +80,8 @@ gsap.utils.toArray("[data-shape], .about").forEach((section) => {
     start: "center center",
     // the car section holds longer: scrolling through it turns the photo helix
     end: section.id === "offscreen" ? "+=260%" : "+=60%",
-    pin: true,
+    // calm mode reads straight down; only the car helix still needs its pin to turn
+    pin: !calm || section.id === "offscreen",
   }));
 });
 
